@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.82
-Release: 16
+Release: 18
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -133,6 +133,8 @@ fi
 %{_libdir}/pkgconfig/ctdb.pc
 
 %changelog
+* Tue Dec 8 2009 : Version 1.0.82-18
+ - Remove dodgy talloc fix and replace with correct fix from Rusty.
 * Fri Nov 6 2009 : Version 1.0.82-16
  - a tallock free bug in tcp transport   fixed by wolfgang mueller
  - make sure to ban nodes quuickly if they disagree on the flags of the nodes in teh cluster
