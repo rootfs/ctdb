@@ -266,6 +266,14 @@ static int ctdb_local_attach(struct ctdb_context *ctdb, const char *db_name, boo
 		ctdb_check_db_empty(ctdb_db);
 	}
 
+	if (persistent) {
+		TDB_DATA transaction_key;
+		transaction_key.dptr = discard_const(
+			CTDB_TRANSACTION_LOCK_KEY);
+		transaction_key.dsize = strlen(CTDB_TRANSACTION_LOCK_KEY);
+		tdb_delete(ctdb_db->ltdb->tdb, transaction_key);
+	}
+
 	DLIST_ADD(ctdb->db_list, ctdb_db);
 
 	/* setting this can help some high churn databases */
