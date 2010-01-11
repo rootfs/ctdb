@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.82
-Release: 18
+Release: 19
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -133,6 +133,8 @@ fi
 %{_libdir}/pkgconfig/ctdb.pc
 
 %changelog
+* Tue Jan 12 2010 : Version 1.0.82-19
+ - Various changes to reduce the loglevels for informational messages
 * Tue Dec 8 2009 : Version 1.0.82-18
  - Remove dodgy talloc fix and replace with correct fix from Rusty.
 * Fri Nov 6 2009 : Version 1.0.82-16
