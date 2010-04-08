@@ -1234,6 +1234,7 @@ static void reload_nodes_file(struct ctdb_context *ctdb)
 }
 
 static int ctdb_reload_remote_public_ips(struct ctdb_context *ctdb,
+					 struct ctdb_recoverd *rec,
 					 struct ctdb_node_map *nodemap,
 					 uint32_t *culprit)
 {
@@ -1278,6 +1279,11 @@ static int ctdb_reload_remote_public_ips(struct ctdb_context *ctdb,
 				*culprit = ctdb->nodes[j]->pnn;
 			}
 			return -1;
+		}
+
+		if (verify_remote_ip_allocation(ctdb, ctdb->nodes[j]->known_public_ips)) {
+			DEBUG(DEBUG_ERR,("Node %d has inconsistent public ip allocation and needs update.\n", ctdb->nodes[j]->pnn));
+			rec->need_takeover_run = true;
 		}
 
 		/* grab a new shiny list of public ips from the node */
@@ -1576,7 +1582,7 @@ static int do_recovery(struct ctdb_recoverd *rec,
 	/*
 	  tell nodes to takeover their public IPs
 	 */
-	ret = ctdb_reload_remote_public_ips(ctdb, nodemap, &culprit);
+	ret = ctdb_reload_remote_public_ips(ctdb, rec, nodemap, &culprit);
 	if (ret != 0) {
 		DEBUG(DEBUG_ERR,("Failed to read public ips from remote node %d\n",
 				 culprit));
@@ -1969,7 +1975,7 @@ static void process_ipreallocate_requests(struct ctdb_context *ctdb, struct ctdb
 	/* update the list of public ips that a node can handle for
 	   all connected nodes
 	*/
-	ret = ctdb_reload_remote_public_ips(ctdb, rec->nodemap, &culprit);
+	ret = ctdb_reload_remote_public_ips(ctdb, rec, rec->nodemap, &culprit);
 	if (ret != 0) {
 		DEBUG(DEBUG_ERR,("Failed to read public ips from remote node %d\n",
 				 culprit));
@@ -2422,9 +2428,9 @@ static enum monitor_result verify_recmaster(struct ctdb_recoverd *rec, struct ct
 }
 
 
-/* called to check that the allocation of public ip addresses is ok.
+/* called to check that the local allocation of public ip addresses is ok.
 */
-static int verify_ip_allocation(struct ctdb_context *ctdb, struct ctdb_recoverd *rec, uint32_t pnn)
+static int verify_local_ip_allocation(struct ctdb_context *ctdb, struct ctdb_recoverd *rec, uint32_t pnn)
 {
 	TALLOC_CTX *mem_ctx = talloc_new(NULL);
 	struct ctdb_control_get_ifaces *ifaces = NULL;
@@ -3112,7 +3118,7 @@ again:
 	 */ 
 	if (ctdb->do_checkpublicip) {
 		if (rec->ip_check_disable_ctx == NULL) {
-			if (verify_ip_allocation(ctdb, rec, pnn) != 0) {
+			if (verify_local_ip_allocation(ctdb, rec, pnn) != 0) {
 				DEBUG(DEBUG_ERR, (__location__ " Public IPs were inconsistent.\n"));
 			}
 		}
@@ -3382,7 +3388,7 @@ again:
 		/* update the list of public ips that a node can handle for
 		   all connected nodes
 		*/
-		ret = ctdb_reload_remote_public_ips(ctdb, nodemap, &culprit);
+		ret = ctdb_reload_remote_public_ips(ctdb, rec, nodemap, &culprit);
 		if (ret != 0) {
 			DEBUG(DEBUG_ERR,("Failed to read public ips from remote node %d\n",
 					 culprit));
