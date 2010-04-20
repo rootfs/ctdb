@@ -193,14 +193,15 @@ case "$1" in
 		# we dont know how to test ib links
 		;;
 	    *)
-		[ -z "$IFACE" ] || {
-		    /usr/sbin/ethtool $IFACE | grep -q 'Link detected: yes' || {
+		[ -z "$IFACE" ] {
+		    [ "$(basename $(readlink /sys/class/net/$IFACE/device/driver))" = virtio_net ] ||
+		    ethtool $IFACE | grep -q 'Link detected: yes' || {
 			# On some systems, this is not successful when a
 			# cable is plugged but the interface has not been
 			# brought up previously. Bring the interface up and
 			# try again...
-			/sbin/ip link set $IFACE up
-			/usr/sbin/ethtool $IFACE | grep -q 'Link detected: yes' || {
+			ip link set $IFACE up
+			ethtool $IFACE | grep -q 'Link detected: yes' || {
 			    echo "ERROR: No link on the public network interface $IFACE"
 			    exit 1
 			}
