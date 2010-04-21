@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 14
+Release: 15
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -123,6 +123,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Wed Apr 21 2010 : Version 1.0.112-15
+ - Change how we add/remove iptable rules during recovery to make 
+   rules leaks less likey.
+ - change a debug message loglevel from ERR to NOTICE
+   BZ62086
+ - In the recovery daemon, track pulbic ip assignment
+   across the cluster and verify consistency.
+ - From Martins: change the 10.interface script to handle
+   virtio interfaces correctly for virtual clusters.
+ - Make the recovery master verify the reclock setting across the cluster
+   and ban nodes with inconsistencies.  
+   BZ56354
 * Mon Mar 29 2010 : Version 1.0.112-14
  - Wipe the new serverid database before starting winbind
 * Wed Mar 25 2010 : Version 1.0.112-13
