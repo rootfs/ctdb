@@ -64,6 +64,9 @@ struct ctdb_recoverd {
 	TALLOC_CTX *ip_reallocate_ctx;
 	struct ip_reallocate_list *reallocate_callers;
 	TALLOC_CTX *ip_check_disable_ctx;
+
+	const char *reclock_file_path;
+	uint32_t reclock_check_count;
 };
 
 #define CONTROL_TIMEOUT() timeval_current_ofs(ctdb->tunable.recover_timeout, 0)
@@ -1973,6 +1976,69 @@ static void election_handler(struct ctdb_context *ctdb, uint64_t srvid,
 }
 
 
+static void async_reclock_path_callback(struct ctdb_context *ctdb, uint32_t node_pnn, int32_t res, TDB_DATA data, void *callback_data)
+{
+	struct ctdb_recoverd *rec = talloc_get_type(callback_data, struct ctdb_recoverd);
+	const char *name;
+
+	if (data.dsize == 0) {
+		return;
+	}
+
+	name = (char *)data.dptr;
+
+	/* The first one we get is the one we will trust. Everyone which
+	   uses a different file will get their ban count upped */
+	if (rec->reclock_file_path == NULL) {
+		rec->reclock_file_path = talloc_strdup(rec, name);
+		return;
+	}
+
+	if (!strcmp(rec->reclock_file_path, name)) {
+		return;
+	}
+
+	DEBUG(DEBUG_CRIT,("ERROR: Node %u has inconsistent reclock file setting. Verify reclock settings on all nodes in the cluster.\n", node_pnn));
+	ctdb_set_culprit_count(rec, node_pnn, rec->nodemap->num);
+}
+
+static int verify_reclock_file_path(struct ctdb_recoverd *rec)
+{
+	uint32_t *nodes;
+	TALLOC_CTX *tmp_ctx;
+	struct ctdb_context *ctdb = rec->ctdb;
+
+	/* only check once every 10 seconds */
+	rec->reclock_check_count++;
+	if (rec->reclock_check_count < 10) {
+		return 0;
+	}
+
+	rec->reclock_check_count = 0;
+	if (rec->reclock_file_path != NULL) {
+		talloc_free(discard_const(rec->reclock_file_path));
+		rec->reclock_file_path = NULL;
+	}
+
+	tmp_ctx = talloc_new(ctdb);
+	CTDB_NO_MEMORY(ctdb, tmp_ctx);
+
+	nodes = list_of_active_nodes(ctdb, rec->nodemap, tmp_ctx, true);
+	if (ctdb_client_async_control(ctdb, CTDB_CONTROL_GET_RECLOCK_FILE,
+					nodes, 0,
+					CONTROL_TIMEOUT(),
+					false, tdb_null,
+					async_reclock_path_callback, NULL,
+					rec) != 0) {
+		DEBUG(DEBUG_ERR, (__location__ " Failed to verify reclock path settings.\n"));
+		talloc_free(tmp_ctx);
+		return -1;
+	}
+
+	talloc_free(tmp_ctx);
+	return 0;
+}
+
 /*
   force the start of the election process
  */
@@ -2987,6 +3053,9 @@ again:
 		goto again;
 	}
 
+
+	/* ensure we all share the same setting for the reclock file */
+	verify_reclock_file_path(rec);
 
 	/* ensure our local copies of flags are right */
 	ret = update_local_flags(rec, nodemap);
