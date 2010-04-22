@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 15
+Release: 16
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -124,6 +124,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Thu Apr 22 2010 : Version 1.0.112-16
+ - Fix for a syntax error bug in 10.interfaces
+ - Add a ctdb-crash-cleanup-sh script that can be used
+   from a cronjob to release ip addresses if ctdb has stopped.
 * Wed Apr 21 2010 : Version 1.0.112-15
  - Change how we add/remove iptable rules during recovery to make 
    rules leaks less likey.
