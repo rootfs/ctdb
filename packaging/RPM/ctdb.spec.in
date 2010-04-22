@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 16
+Release: 17
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -124,6 +124,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Fri Apr 23 2010 : Version 1.0.112-17
+ - In ctdb-crash-cleanup.sh  also check for and remove the NATGW address
+   if set.
+ - Add monitoring and warning of low memory condition
+   CTDB_MONITOR_FREE_MEMORY_WARN
 * Thu Apr 22 2010 : Version 1.0.112-16
  - Fix for a syntax error bug in 10.interfaces
  - Add a ctdb-crash-cleanup-sh script that can be used
