@@ -1566,5 +1566,7 @@ int ctdb_recheck_persistent_health(struct ctdb_context *ctdb);
 
 int verify_remote_ip_allocation(struct ctdb_context *ctdb, 
 				struct ctdb_all_public_ips *ips);
+int update_ip_assignment_tree(struct ctdb_context *ctdb,
+				struct ctdb_public_ip *ip);
 
 #endif
