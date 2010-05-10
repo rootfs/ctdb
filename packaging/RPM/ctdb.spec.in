@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 19
+Release: 20
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Tue May 11 2010 : Version 1.0.112-20
+ - Add number of recoveries done to the ctdb statistics output.
+ - Use the fuill range for IDR values. 
+   BZ 60540
+ - When performing a recovery, make sure all nodes agree with recmaster
+   on the reclock file.
+   BZ 62748
+ - Lower the loglevel for some debug messages
+   BZ 63074
 * Tue May 4 2010 : Version 1.0.112-19
  - Add an eventscript 62.cnfs to allow better integration with GPFS.
    BZ 61913
