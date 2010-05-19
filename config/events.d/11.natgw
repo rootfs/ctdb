@@ -11,6 +11,8 @@ loadconfig
 [ -z "$CTDB_NATGW_PUBLIC_IFACE" ] && exit 0
 
 delete_all() {
+	CTDB_NATGW_PUBLIC_IP_HOST=`echo $CTDB_NATGW_PUBLIC_IP | sed -e "s/\/.*/\/32/"`
+
 	remove_ip $CTDB_NATGW_PUBLIC_IP $CTDB_NATGW_PUBLIC_IFACE
 	remove_ip $CTDB_NATGW_PUBLIC_IP_HOST lo
 
