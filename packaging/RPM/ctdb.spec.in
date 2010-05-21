@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 20
+Release: 21
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Fri May 21 2010 : Version 1.0.112-21
+ - Fix a bug where we would fail to remove the natgw configuration
+   and would leave a ip address for natgw still remaining on loopback.
+   BZ 58317
+ - In the ctdb command line tool, we do not wait long enough for the ipreallocate
+   command to finish on the recovery daemon. which sometimes would timeout if the
+   recovery daemon was busy, or we had rolling recoveries.
+   BZ 61783
+ - During failed recoveries we could get in a state where recovery attempts stopped
+   while database priority level 2 or 3 remain frozen.
+   BZ 63951
 * Tue May 11 2010 : Version 1.0.112-20
  - Add number of recoveries done to the ctdb statistics output.
  - Use the fuill range for IDR values. 
