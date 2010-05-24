@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 21
+Release: 22
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Mon May 24 2010 : Version 1.0.112-22
+ - Fix bug in 62.cnfs to allow exports that are quoted.
+ - Add monitoring og Quorum for the 62.cnfs script
+ - Allow restoredb to restore a backup to to a different database
 * Fri May 21 2010 : Version 1.0.112-21
  - Fix a bug where we would fail to remove the natgw configuration
    and would leave a ip address for natgw still remaining on loopback.
