@@ -1653,7 +1653,9 @@ static void ctdb_tickle_sentenced_connections(struct event_context *ev, struct t
  */
 static int ctdb_killtcp_destructor(struct ctdb_kill_tcp *killtcp)
 {
-	killtcp->vnn->killtcp = NULL;
+	if (killtcp->vnn) {
+		killtcp->vnn->killtcp = NULL;
+	}
 	return 0;
 }
 
@@ -2143,6 +2145,9 @@ int32_t ctdb_control_del_public_address(struct ctdb_context *ctdb, TDB_DATA inda
 					 vnn->iface, 
 					 talloc_strdup(mem_ctx, ctdb_addr_to_str(&vnn->public_address)),
 					 vnn->public_netmask_bits);
+			if (vnn->killtcp) {
+				vnn->killtcp->vnn = NULL;
+			}
 			talloc_free(vnn);
 			if (ret != 0) {
 				return -1;
