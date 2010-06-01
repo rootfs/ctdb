@@ -2022,7 +2022,7 @@ static int control_ipreallocate(struct ctdb_context *ctdb, int argc, const char 
 	/* register a message port for receiveing the reply so that we
 	   can receive the reply
 	*/
-	ctdb_set_message_handler(ctdb, rd.srvid, ip_reallocate_handler, NULL);
+	ctdb_client_set_message_handler(ctdb, rd.srvid, ip_reallocate_handler, NULL);
 
 	data.dptr = (uint8_t *)&rd;
 	data.dsize = sizeof(rd);
@@ -2819,7 +2819,7 @@ static int control_getlog(struct ctdb_context *ctdb, int argc, const char **argv
 
 	DEBUG(DEBUG_ERR, ("Pulling logs from node %u\n", options.pnn));
 
-	ctdb_set_message_handler(ctdb, log_addr.srvid, log_handler, NULL);
+	ctdb_client_set_message_handler(ctdb, log_addr.srvid, log_handler, NULL);
 	sleep(1);
 
 	DEBUG(DEBUG_ERR,("Listen for response on %d\n", (int)log_addr.srvid));
@@ -4198,7 +4198,7 @@ static int control_rddumpmemory(struct ctdb_context *ctdb, int argc, const char 
 	/* register a message port for receiveing the reply so that we
 	   can receive the reply
 	*/
-	ctdb_set_message_handler(ctdb, rd.srvid, mem_dump_handler, NULL);
+	ctdb_client_set_message_handler(ctdb, rd.srvid, mem_dump_handler, NULL);
 
 
 	data.dptr = (uint8_t *)&rd;
@@ -4271,7 +4271,7 @@ static int control_msglisten(struct ctdb_context *ctdb, int argc, const char **a
 
 	/* register a message port and listen for messages
 	*/
-	ctdb_set_message_handler(ctdb, srvid, msglisten_handler, NULL);
+	ctdb_client_set_message_handler(ctdb, srvid, msglisten_handler, NULL);
 	printf("Listening for messages on srvid:%d\n", (int)srvid);
 
 	while (1) {	
