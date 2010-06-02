@@ -13,6 +13,8 @@ loadconfig
 delete_all() {
 	CTDB_NATGW_PUBLIC_IP_HOST=`echo $CTDB_NATGW_PUBLIC_IP | sed -e "s/\/.*/\/32/"`
 
+	iptables -D INPUT -p tcp --syn -d $CTDB_NATGW_PUBLIC_IP_HOST -j REJECT 2>/dev/null
+
 	remove_ip $CTDB_NATGW_PUBLIC_IP $CTDB_NATGW_PUBLIC_IFACE
 	remove_ip $CTDB_NATGW_PUBLIC_IP_HOST lo
 
@@ -34,6 +36,12 @@ case "$1" in
 		echo ERROR: NATGW configured to use a public address. NATGW must not use a public address.
 		exit 1
 	}
+
+	# block all incoming connections to the natgw address
+	CTDB_NATGW_PUBLIC_IP_HOST=`echo $CTDB_NATGW_PUBLIC_IP | sed -e "s/\/.*/\/32/"`
+	iptables -D INPUT -p tcp --syn -d $CTDB_NATGW_PUBLIC_IP_HOST -j REJECT 2>/dev/null
+	iptables -I INPUT -p tcp --syn -d $CTDB_NATGW_PUBLIC_IP_HOST -j REJECT 2>/dev/null
+
 
 	# do not respond to ARPs that are for ip addresses with scope 'host'
 	echo 3 > /proc/sys/net/ipv4/conf/all/arp_ignore
