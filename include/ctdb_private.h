@@ -345,6 +345,8 @@ struct ctdb_statistics {
 	double max_lockwait_latency;
 	double max_childwrite_latency;
 	uint32_t num_recoveries;
+	struct timeval statistics_start_time;
+	struct timeval statistics_current_time;
 };
 
 
