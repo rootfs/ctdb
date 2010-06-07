@@ -56,6 +56,8 @@ static int control_version(struct ctdb_context *ctdb, int argc, const char **arg
 }
 #endif
 
+static int control_ipreallocate(struct ctdb_context *ctdb, int argc, const char **argv);
+
 
 /*
   verify that a node exists and is reachable
@@ -1057,6 +1059,7 @@ static int move_ip(struct ctdb_context *ctdb, ctdb_sock_addr *addr, uint32_t pnn
 		return -1;
 	}
 
+
 	talloc_free(tmp_ctx);
 	return 0;
 }
@@ -1315,10 +1318,41 @@ static int control_addip(struct ctdb_context *ctdb, int argc, const char **argv)
 	} else {
 		pnn  = ips->ips[i].pnn;
 	}
+	talloc_free(ips);
+	ips = NULL;
 
-	if (move_ip(ctdb, &addr, pnn) != 0) {
+again:
+	ret = move_ip(ctdb, &addr, pnn);
+	if (ret != 0) {
 		DEBUG(DEBUG_ERR,("Failed to move ip to node %d\n", pnn));
+		return ret;
+	}
+
+	ret = control_ipreallocate(ctdb, argc, argv);
+	if (ret != 0) {
+		DEBUG(DEBUG_ERR,("IP Reallocate failed on node %u\n", options.pnn));
+		return ret;
+	}
+
+	/* read the public ip list from the node */
+	ret = ctdb_ctrl_get_public_ips(ctdb, TIMELIMIT(), pnn, ctdb, &ips);
+	if (ret != 0) {
+		DEBUG(DEBUG_ERR, ("Unable to get public ip list from node %u\n", pnn));
+		talloc_free(tmp_ctx);
 		return -1;
+	}
+
+	/* make sure the ip is held by node pnn */
+	for (i=0; i < ips->num; i++) {
+		if (ctdb_same_ip(&addr, &ips->ips[i].addr)) {
+			break;
+		}
+	}
+	if (i == ips->num) {
+		DEBUG(DEBUG_ERR,(__location__ " Move ip failed. Trying it again=\n"));
+		talloc_free(ips);
+		ips = NULL;
+		goto again;
 	}
 
 	talloc_free(tmp_ctx);
@@ -1726,7 +1760,9 @@ static int control_getpid(struct ctdb_context *ctdb, int argc, const char **argv
 static void ip_reallocate_handler(struct ctdb_context *ctdb, uint64_t srvid, 
 			     TDB_DATA data, void *private_data)
 {
-	exit(0);
+	uint32_t *trigger = private_data;
+
+	*trigger = 1;
 }
 
 static void ctdb_every_second(struct event_context *ev, struct timed_event *te, struct timeval t, void *p)
@@ -1750,6 +1786,7 @@ static int control_ipreallocate(struct ctdb_context *ctdb, int argc, const char 
 	struct ctdb_node_map *nodemap=NULL;
 	int retries=0;
 	struct timeval tv = timeval_current();
+	uint32_t rmcb;
 
 	/* we need some events to trigger so we can timeout and restart
 	   the loop
@@ -1768,7 +1805,7 @@ static int control_ipreallocate(struct ctdb_context *ctdb, int argc, const char 
 	/* register a message port for receiveing the reply so that we
 	   can receive the reply
 	*/
-	ctdb_set_message_handler(ctdb, rd.srvid, ip_reallocate_handler, NULL);
+	ctdb_set_message_handler(ctdb, rd.srvid, ip_reallocate_handler, &rmcb);
 
 	data.dptr = (uint8_t *)&rd;
 	data.dsize = sizeof(rd);
@@ -1803,7 +1840,7 @@ again:
 	}
 
 
-	/* check tha there are nodes available that can act as a recmaster */
+	/* check that there are nodes available that can act as a recmaster */
 	for (i=0; i<nodemap->num; i++) {
 		if (nodemap->nodes[i].flags & (NODE_FLAGS_DELETED|NODE_FLAGS_BANNED|NODE_FLAGS_STOPPED)) {
 			continue;
@@ -1832,6 +1869,7 @@ again:
 		goto again;
 	} 
 
+	rmcb = 0;
 	ret = ctdb_send_message(ctdb, recmaster, CTDB_SRVID_TAKEOVER_RUN, data);
 	if (ret != 0) {
 		DEBUG(DEBUG_ERR,("Failed to send ip takeover run request message to %u\n", options.pnn));
@@ -1840,14 +1878,16 @@ again:
 
 	tv = timeval_current();
 	/* this loop will terminate when we have received the reply */
-	while (timeval_elapsed(&tv) < 3.0) {
+	while (rmcb == 0 && timeval_elapsed(&tv) < 3.0) {
 		event_loop_once(ctdb->ev);
 	}
 
-	DEBUG(DEBUG_ERR,("Timed out waiting for recmaster ipreallocate. Trying again\n"));
-	retries++;
-	sleep(1);
-	goto again;
+	if (rmcb == 0) {
+		DEBUG(DEBUG_ERR,("Timed out waiting for recmaster ipreallocate. Trying again\n"));
+		retries++;
+		sleep(1);
+		goto again;
+	}
 
 	return 0;
 }
