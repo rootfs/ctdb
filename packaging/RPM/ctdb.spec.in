@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 22
+Release: 23
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,18 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Tue Jun 8 2010 : Version 1.0.112-23
+ - Fix a SEGV that can be triggered by "ctdb delip"
+   BZ 62783
+ - Add iptables filters to stop clients from connecting to the NATGW
+   address.
+   BZ62613
+ - Add timestamps to the ctdb statistics output
+ - Change "ctdb addip" to block until the address is active
+   BZ63191
+ - Add additional log messages when tdbs can no longer be locked/chain
+   unlocked
+   BZ64688
 * Mon May 24 2010 : Version 1.0.112-22
  - Fix bug in 62.cnfs to allow exports that are quoted.
  - Add monitoring og Quorum for the 62.cnfs script
