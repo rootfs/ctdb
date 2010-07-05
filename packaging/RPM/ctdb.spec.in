@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 23
+Release: 24
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,15 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Mon Jul 5 2010 : Version 1.0.112-24
+ - Extra logging on tdb_chainunlock failures.
+ - Extra sanity check in ctdb_become_dmaster
+   BZ65158
+ - More robustness against IDR wrap
+   BZ65158
+ - Recovery failure under stress fix
+   BZ:65158
+
 * Tue Jun 8 2010 : Version 1.0.112-23
  - Fix a SEGV that can be triggered by "ctdb delip"
    BZ 62783
