@@ -601,6 +601,12 @@ ctdb_standard_event_handler ()
     esac
 }
 
+# iptables doesn't like being re-entered, so flock-wrap it.
+iptables()
+{
+	flock -w 30 /var/ctdb/iptables-ctdb.flock /sbin/iptables "$@"
+}
+
 ########################################################
 # load a site local config file
 ########################################################
