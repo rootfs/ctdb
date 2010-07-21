@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 27
+Release: 28
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Wed Jul 21 2010 : Version 1.0.112-28
+ - Turn back on deterministic IPs by default
+   (needs more analysis)
+
 * Wed Jul 21 2010 : Version 1.0.112-27
  - Turn off deterministic IPs by default
    CQ:S1018175
