@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 26
+Release: 27
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Wed Jul 21 2010 : Version 1.0.112-27
+ - Turn off deterministic IPs by default
+   CQ:S1018175
+ - vaccuum abort during freeze
+   CQ:S1018154 & S1018349
+ - logging enhancement for ctdbd children
+
 * Thu Jul 15 2010 : Version 1.0.112-26
  - iptables parallel invocation fix
    CQ:S1018353
