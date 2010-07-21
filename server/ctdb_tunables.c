@@ -47,7 +47,7 @@ static const struct {
 	{ "DatabaseMaxDead",      5,  offsetof(struct ctdb_tunable, database_max_dead) },
 	{ "RerecoveryTimeout",   10,  offsetof(struct ctdb_tunable, rerecovery_timeout) },
 	{ "EnableBans",           1,  offsetof(struct ctdb_tunable, enable_bans) },
-	{ "DeterministicIPs",     0,  offsetof(struct ctdb_tunable, deterministic_public_ips) },
+	{ "DeterministicIPs",     1,  offsetof(struct ctdb_tunable, deterministic_public_ips) },
 	{ "ReclockPingPeriod",   60,  offsetof(struct ctdb_tunable,  reclock_ping_period) },
 	{ "NoIPFailback",         0,  offsetof(struct ctdb_tunable, no_ip_failback) },
 	{ "VerboseMemoryNames",   0,  offsetof(struct ctdb_tunable, verbose_memory_names) },
