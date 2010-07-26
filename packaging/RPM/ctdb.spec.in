@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 29
+Release: 30
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Mon Jul 26 2010 : Version 1.0.112-30
+ - last minute fix for crash bug in the recent "vacuum abort" code.
+
 * Mon Jul 26 2010 : Version 1.0.112-29
  - Fix for a SEGV that can happen when tcp tickles fail/timeout
    CQ:S1019041
