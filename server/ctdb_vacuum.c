@@ -660,6 +660,7 @@ static int ctdb_repack_db(struct ctdb_db_context *ctdb_db, int abortfd, TALLOC_C
 	vdata->repack_limit = repack_limit;
 	vdata->delete_tree = trbt_create(vdata, 0);
 	vdata->abortfd = abortfd;
+	vdata->ctdb_db = ctdb_db;
 	if (vdata->delete_tree == NULL) {
 		DEBUG(DEBUG_ERR,(__location__ " Out of memory\n"));
 		talloc_free(vdata);
@@ -938,9 +939,9 @@ void ctdb_stop_vacuuming(struct ctdb_context *ctdb)
 	/* FIXME: We don't just free them, since current TDB is not robust
 	 * against death during transaction commit. */
 	for (i = ctdb->vacuumers; i; i = i->next) {
-		DEBUG(DEBUG_INFO, ("Aborting vacuuming for %s (%p)\n",
+		DEBUG(DEBUG_INFO, ("Aborting vacuuming for %s (%i)\n",
 				   i->vacuum_handle->ctdb_db->db_name,
-				   i->child_pid));
+				   (int)i->child_pid));
 		write(i->abortfd[1], &c, 1);
 	}
 }
