@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 30
+Release: 31
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Tue Aug 3 2010 : Version 1.0.112-31
+ - Retry the vacuum abort code.
+ - Add codestyle doc
+ - When rebalancing ip addresses, increase number of iterations from 5
+ - When using deterministic ips, dont force ips without home address
+   to move back.
 * Mon Jul 26 2010 : Version 1.0.112-30
  - last minute fix for crash bug in the recent "vacuum abort" code.
 
