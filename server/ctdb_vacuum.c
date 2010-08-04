@@ -771,6 +771,7 @@ static int vacuum_child_destructor(struct ctdb_vacuum_child_context *child_ctx)
 	}
 
 	DLIST_REMOVE(ctdb->vacuumers, child_ctx);
+	close(child_ctx->abortfd[1]);
 
 	event_add_timed(ctdb->ev, child_ctx->vacuum_handle,
 			timeval_current_ofs(get_vacuum_interval(ctdb_db), 0), 
