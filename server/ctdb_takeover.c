@@ -737,7 +737,7 @@ create_merged_ip_list(struct ctdb_context *ctdb)
  */
 int ctdb_takeover_run(struct ctdb_context *ctdb, struct ctdb_node_map *nodemap)
 {
-	int i, num_healthy, retries, num_ips;
+  int i, num_healthy, retries, num_ips;
 	struct ctdb_public_ip ip;
 	struct ctdb_public_ipv4 ipv4;
 	uint32_t mask;
@@ -795,12 +795,7 @@ int ctdb_takeover_run(struct ctdb_context *ctdb, struct ctdb_node_map *nodemap)
 	if (1 == ctdb->tunable.deterministic_public_ips) {		
 		DEBUG(DEBUG_NOTICE,("Deterministic IPs enabled. Resetting all ip allocations\n"));
 		for (i=0,tmp_ip=all_ips;tmp_ip;tmp_ip=tmp_ip->next,i++) {
-			int tmp_pnn;
-
-			tmp_pnn = i%nodemap->num;
-			if (can_node_serve_ip(ctdb, tmp_pnn, tmp_ip) == 0) {
-				tmp_ip->pnn = tmp_pnn;
-			}
+			tmp_ip->pnn = i%nodemap->num;
 		}
 	}
 
