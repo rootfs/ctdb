@@ -251,11 +251,11 @@ case "$1" in
 		ctdb_check_tcp_ports $smb_ports || exit $?
 	}
 
-	# check winbind is OK
-	check_ctdb_manages_winbind
-	[ "$CTDB_MANAGES_WINBIND" = "yes" ] && {
-		ctdb_check_command "winbind" "wbinfo -p"
-	}
+#	# check winbind is OK
+#	check_ctdb_manages_winbind
+#	[ "$CTDB_MANAGES_WINBIND" = "yes" ] && {
+#		ctdb_check_command "winbind" "wbinfo -p"
+#	}
 	;;
 
     *)
