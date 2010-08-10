@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 31
+Release: 32
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Tue Aug 10 2010 : Version 1.0.112-32
+ - Dont check if natgw is enabled or not in the natgw script
+ - disable the check if winbind is ok
+ - optimize 61.nfstickles
+ - fix a fd leak from the abort-vacuuming patch
 * Tue Aug 3 2010 : Version 1.0.112-31
  - Retry the vacuum abort code.
  - Add codestyle doc
