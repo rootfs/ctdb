@@ -664,5 +664,6 @@ const char *ctdb_eventscript_call_names[] = {
 	"monitor",
 	"status",
 	"shutdown",
-	"reload"
+	"reload",
+	"ipreallocated"
 };
