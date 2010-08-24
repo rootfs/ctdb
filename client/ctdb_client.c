@@ -282,11 +282,6 @@ int ctdb_socket_connect(struct ctdb_context *ctdb)
 	ctdb->daemon.queue = ctdb_queue_setup(ctdb, ctdb, ctdb->daemon.sd, 
 					      CTDB_DS_ALIGNMENT, 
 					      ctdb_client_read_cb, ctdb);
-	if (ctdb->daemon.queue == NULL) {
-		DEBUG(DEBUG_ERR,(__location__ " Failed to setup queue to daemon\n"));
-		return -1;
-	}
-
 	return 0;
 }
 
@@ -840,7 +835,6 @@ struct ctdb_client_control_state *ctdb_control_send(struct ctdb_context *ctdb,
 
 	ret = ctdb_client_queue_pkt(ctdb, &(c->hdr));
 	if (ret != 0) {
-		DEBUG(DEBUG_ERR,(__location__ " Failed to queue packet to ctdb daemon\n"));
 		talloc_free(state);
 		return NULL;
 	}
@@ -870,7 +864,6 @@ int ctdb_control_recv(struct ctdb_context *ctdb,
 	}
 
 	if (state == NULL) {
-		DEBUG(DEBUG_ERR,(__location__ " ctdb_control_recv called with state==NULL\n"));
 		return -1;
 	}
 
@@ -886,12 +879,12 @@ int ctdb_control_recv(struct ctdb_context *ctdb,
 	}
 
 	if (state->state != CTDB_CONTROL_DONE) {
-		DEBUG(DEBUG_ERR,(__location__ " ctdb_control_recv failed with state:%d\n", state->state));
+		DEBUG(DEBUG_ERR,(__location__ " ctdb_control_recv failed\n"));
 		if (state->async.fn) {
 			state->async.fn(state);
 		}
 		talloc_free(tmp_ctx);
-		return -2;
+		return -1;
 	}
 
 	if (state->errormsg) {
@@ -903,7 +896,7 @@ int ctdb_control_recv(struct ctdb_context *ctdb,
 			state->async.fn(state);
 		}
 		talloc_free(tmp_ctx);
-		return -3;
+		return -1;
 	}
 
 	if (outdata) {
@@ -1129,16 +1122,9 @@ struct ctdb_client_control_state *
 ctdb_ctrl_getrecmaster_send(struct ctdb_context *ctdb, TALLOC_CTX *mem_ctx, 
 			struct timeval timeout, uint32_t destnode)
 {
-	struct ctdb_client_control_state *state;
-
-	state = ctdb_control_send(ctdb, destnode, 0, 
+	return ctdb_control_send(ctdb, destnode, 0, 
 			   CTDB_CONTROL_GET_RECMASTER, 0, tdb_null, 
 			   mem_ctx, &timeout, NULL);
-	if (state == NULL) {
-		DEBUG(DEBUG_ERR,(__location__ " Failed to send getrecmaster control to node %u\n", destnode));
-	}
-
-	return state;
 }
 
 int ctdb_ctrl_getrecmaster_recv(struct ctdb_context *ctdb, TALLOC_CTX *mem_ctx, struct ctdb_client_control_state *state, uint32_t *recmaster)
@@ -1148,7 +1134,7 @@ int ctdb_ctrl_getrecmaster_recv(struct ctdb_context *ctdb, TALLOC_CTX *mem_ctx, 
 
 	ret = ctdb_control_recv(ctdb, state, mem_ctx, NULL, &res, NULL);
 	if (ret != 0) {
-		DEBUG(DEBUG_ERR,(__location__ " ctdb_ctrl_getrecmaster_recv failed with error:%d\n", ret));
+		DEBUG(DEBUG_ERR,(__location__ " ctdb_ctrl_getrecmaster_recv failed\n"));
 		return -1;
 	}
 
