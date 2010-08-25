@@ -4798,11 +4798,11 @@ int main(int argc, const char *argv[])
 				close(2);
 			}
 
-			/* initialise ctdb */
-			ctdb = ctdb_cmdline_client(ev);
-
 			if (ctdb_commands[i].without_daemon == false) {
 				const char *socket_name;
+
+				/* initialise ctdb */
+				ctdb = ctdb_cmdline_client(ev);
 
 				if (ctdb == NULL) {
 					DEBUG(DEBUG_ERR, ("Failed to init ctdb\n"));
