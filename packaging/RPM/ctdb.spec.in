@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.3
+Version: 1.2.4
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Aug 30 2010 : Version 1.2.4
+ - fix a bug in the ipreallocate eventscript handling
+ - remove a debug logentry
 * Mon Aug 30 2010 : Version 1.2.3
  - finish moving CTDB off the udnerlying filesystem.
    both tickles and statd information
