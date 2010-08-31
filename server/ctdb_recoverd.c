@@ -2979,10 +2979,6 @@ again:
 			rec->reallocate_callers = NULL;
 		}
 	}
-	/* if there are takeovers requested, perform it and notify the waiters */
-	if (rec->reallocate_callers) {
-		process_ipreallocate_requests(ctdb, rec);
-	}
 
 	if (rec->recmaster == (uint32_t)-1) {
 		DEBUG(DEBUG_NOTICE,(__location__ " Initial recovery master set - forcing election\n"));
@@ -3167,6 +3163,11 @@ again:
 			do_recovery(rec, mem_ctx, pnn, nodemap, vnnmap);
 			goto again;
 		}
+	}
+
+	/* if there are takeovers requested, perform it and notify the waiters */
+	if (rec->reallocate_callers) {
+		process_ipreallocate_requests(ctdb, rec);
 	}
 
 	/* get the nodemap for all active remote nodes
