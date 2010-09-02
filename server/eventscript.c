@@ -34,6 +34,13 @@ static struct {
 
 static void ctdb_event_script_timeout(struct event_context *ev, struct timed_event *te, struct timeval t, void *p);
 
+static void sigalarm(int sig)
+{
+	/* all the child processes will be running in the same process group */
+	kill(-getpgrp(), SIGKILL);
+	_exit(1);
+}
+
 /*
   ctdbd sends us a SIGTERM when we should time out the current script
  */
@@ -41,6 +48,12 @@ static void sigterm(int sig)
 {
 	char tbuf[100], buf[200];
 	time_t t;
+
+	/* Calling system() inside a signal handler can do strange things:
+	 * it usually works, and that's enough for us: it's only for debugging.
+	 * But make sure we terminate. */
+	signal(SIGTERM, sigalarm);
+	alarm(90);
 
 	DEBUG(DEBUG_ERR,("Timed out running script '%s' after %.1f seconds pid :%d\n", 
 		 child_state.script_running, timeval_elapsed(&child_state.start), getpid()));
