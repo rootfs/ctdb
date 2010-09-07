@@ -627,6 +627,7 @@ struct natgw_node {
 static int control_natgwlist(struct ctdb_context *ctdb, int argc, const char **argv)
 {
 	int i, ret;
+	uint32_t capabilities;
 	const char *natgw_list;
 	int nlines;
 	char **lines;
@@ -705,6 +706,14 @@ static int control_natgwlist(struct ctdb_context *ctdb, int argc, const char **a
 	 */
 	for(i=0;i<nodemap->num;i++){
 		if (!(nodemap->nodes[i].flags & (NODE_FLAGS_DISCONNECTED|NODE_FLAGS_STOPPED|NODE_FLAGS_DELETED|NODE_FLAGS_BANNED|NODE_FLAGS_UNHEALTHY))) {
+			ret = ctdb_ctrl_getcapabilities(ctdb, TIMELIMIT(), nodemap->nodes[i].pnn, &capabilities);
+			if (ret != 0) {
+				DEBUG(DEBUG_ERR, ("Unable to get capabilities from node %u\n", nodemap->nodes[i].pnn));
+				return ret;
+			}
+			if (!(capabilities&CTDB_CAP_NATGW)) {
+				continue;
+			}
 			printf("%d %s\n", nodemap->nodes[i].pnn,ctdb_addr_to_str(&nodemap->nodes[i].addr));
 			break;
 		}
@@ -713,6 +722,14 @@ static int control_natgwlist(struct ctdb_context *ctdb, int argc, const char **a
 	if (i == nodemap->num) {
 		for(i=0;i<nodemap->num;i++){
 			if (!(nodemap->nodes[i].flags & (NODE_FLAGS_DISCONNECTED|NODE_FLAGS_STOPPED|NODE_FLAGS_DELETED))) {
+				ret = ctdb_ctrl_getcapabilities(ctdb, TIMELIMIT(), nodemap->nodes[i].pnn, &capabilities);
+				if (ret != 0) {
+					DEBUG(DEBUG_ERR, ("Unable to get capabilities from node %u\n", nodemap->nodes[i].pnn));
+					return ret;
+				}
+				if (!(capabilities&CTDB_CAP_NATGW)) {
+					continue;
+				}
 				printf("%d %s\n", nodemap->nodes[i].pnn,ctdb_addr_to_str(&nodemap->nodes[i].addr));
 				break;
 			}
@@ -722,6 +739,14 @@ static int control_natgwlist(struct ctdb_context *ctdb, int argc, const char **a
 	if (i == nodemap->num) {
 		for(i=0;i<nodemap->num;i++){
 			if (!(nodemap->nodes[i].flags & (NODE_FLAGS_DISCONNECTED|NODE_FLAGS_DELETED))) {
+				ret = ctdb_ctrl_getcapabilities(ctdb, TIMELIMIT(), nodemap->nodes[i].pnn, &capabilities);
+				if (ret != 0) {
+					DEBUG(DEBUG_ERR, ("Unable to get capabilities from node %u\n", nodemap->nodes[i].pnn));
+					return ret;
+				}
+				if (!(capabilities&CTDB_CAP_NATGW)) {
+					continue;
+				}
 				printf("%d %s\n", nodemap->nodes[i].pnn, ctdb_addr_to_str(&nodemap->nodes[i].addr));
 				break;
 			}
