@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.4
+Version: 1.2.5
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,15 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu Sep 9 2010 : Version 1.2.5
+ - Suppress some VSFTPD warnings
+ - Make sure all STATD directories exist before we dereference them
+ - AIX socket fix
+ - Fix for a crash when we write a debug message after a memory allocation
+   fail. Fix the message and call ctdb_fatal() properly
+ - Move the state directory off /etc/ctdb and to /var/ctdb
+ - Natgw changes to allow "slave only" natgw members
+ - Fix "ctdb listnodes" so it works again.
 * Mon Aug 30 2010 : Version 1.2.4
  - fix a bug in the ipreallocate eventscript handling
  - remove a debug logentry
