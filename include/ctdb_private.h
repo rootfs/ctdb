@@ -1336,4 +1336,6 @@ int verify_remote_ip_allocation(struct ctdb_context *ctdb,
 int update_ip_assignment_tree(struct ctdb_context *ctdb,
 				struct ctdb_public_ip *ip);
 
+int ctdb_init_tevent_logging(struct ctdb_context *ctdb);
+
 #endif
