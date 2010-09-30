@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 34
+Release: 35
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Fri Oct 1 2010 : Version 1.0.112-35
+ - Fix futex hang during eventscript timeout
+ - Fix a crash when printing a log message during shutdown
 * Tue Aug 24 2010 : Version 1.0.112-34
  - Merge NFS auto-restart patch from master
 * Tue Aug 11 2010 : Version 1.0.112-33
