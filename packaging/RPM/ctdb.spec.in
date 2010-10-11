@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.5
+Version: 1.2.6
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,17 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Tue Oct 12 2010 : Version 1.2.6
+ - Move config.tdb handling into a function in 00.ctdb 
+ - Latency counters min/max/avg for all latency statistics
+ - Update default hash size to be 100001
+ - Check all bond devices, dont exit after the first one
+ - Change to useing the Jenkins hash for LMASTER selection
+ - Sync with TDB from upstream samba
+ - idtree fix for AIX
+ - remove some log messages
+ - add rolling statistics
+ - libctdb updates
 * Thu Sep 9 2010 : Version 1.2.5
  - Suppress some VSFTPD warnings
  - Make sure all STATD directories exist before we dereference them
