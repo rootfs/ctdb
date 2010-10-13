@@ -40,6 +40,7 @@ case "$1" in
 
      monitor)
 	mydir=$NFS_TICKLE_SHARED_DIRECTORY/`hostname`
+	mkdir -p $mydir
 	rm -f $mydir/*
 	# record our connections to shared storage
 	netstat -tn |
