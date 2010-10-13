@@ -93,7 +93,13 @@ case "$1" in
 	} || exit $?
 
 	# check that lockd responds to rpc requests
-	ctdb_check_rpc "lockd" 100021 1
+	(ctdb_check_rpc "lockd" 100021 1)
+	[ $? = "0" ] || {
+	    echo "Trying to restart lock manager service"
+	    startstop_nfslock restart
+	    exit 1
+	}
+
 	echo "$STATD_SHARED_DIRECTORY" | ctdb_check_directories "statd" || \
 	    exit $?
 
