@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 37
+Release: 38
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Wed Oct 14 2010 : Version 1.0.112-38
+ - Try to restart LOCKD if "service nfslock start" fails.
 * Wed Oct 13 2010 : Version 1.0.112-37
  -Always make sure to create the state directories
 * Tue Oct 5 2010 : Version 1.0.112-36
