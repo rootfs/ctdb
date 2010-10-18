@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.6
+Version: 1.2.7
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,12 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Oct 18 2010 : Version 1.2.7
+ - Dont monitor GPFS filesystems in 62.cnfs
+ - If tdb_open() fails, print errno to make troubleshooting easier
+ - Try restarting RPC.LOCKD if it failed to start
+ - Remove a dbug message
+ - Make sure the statd state directory exists before trying to touch files in it.
 * Tue Oct 12 2010 : Version 1.2.6
  - Move config.tdb handling into a function in 00.ctdb 
  - Latency counters min/max/avg for all latency statistics
