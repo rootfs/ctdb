@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.7
+Version: 1.2.8
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Oct 25 2010 : Version 1.2.8
+ - Allow samba to specify that a new database to attach to/ create
+   should use Jenkins3 hash :  CQ1019744
 * Mon Oct 18 2010 : Version 1.2.7
  - Dont monitor GPFS filesystems in 62.cnfs
  - If tdb_open() fails, print errno to make troubleshooting easier
