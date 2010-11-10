@@ -298,6 +298,7 @@ setup_per_ip_routing()
 
 		cmd="ip rule add from $_ip pref $_pref table $_table_id"
 		echo "$cmd || {" >> $_setup_script
+		echo "    ret=\$?" >> $_setup_script
 		echo "    echo \"$cmd - failed \$ret\"" >> $_setup_script
 		echo "    exit \$ret" >> $_setup_script
 		echo "}" >> $_setup_script
@@ -315,6 +316,7 @@ setup_per_ip_routing()
 
 		cmd="ip route add $_dest $_via dev $_iface table $_table_id"
 		echo "$cmd || {" >> $_setup_script
+		echo "    ret=\$?" >> $_setup_script
 		echo "    echo \"$cmd - failed \$ret\"" >> $_setup_script
 		echo "    exit \$ret" >> $_setup_script
 		echo "}" >> $_setup_script
