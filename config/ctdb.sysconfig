@@ -222,11 +222,16 @@ CTDB_RECOVERY_LOCK="/some/place/on/shared/storage"
 # The default value for CTDB_PER_IP_ROUTING_CONF is "",
 # which means the feature is disabled by default.
 #
+# CTDB_PER_IP_ROUTING_DEBUG=yes lets the script print out
+# debug information to make troubleshooting easier.
+# CTDB_DEBUGLEVEL=DEBUG implies CTDB_PER_IP_ROUTING_DEBUG=yes.
+#
 # CTDB_PER_IP_ROUTING_CONF="/etc/ctdb/per_ip_routing.conf"
 # CTDB_PER_IP_ROUTING_CONF="__auto_link_local__"
 # CTDB_PER_IP_ROUTING_TABLE_ID_LOW=10
 # CTDB_PER_IP_ROUTING_TABLE_ID_HIGH=250
 # CTDB_PER_IP_ROUTING_RULE_PREF=10000
+# CTDB_PER_IP_ROUTING_DEBUG=no
 
 # Make offline interfaces not a reason for being UNHEALTHY.
 # The CTDB_PARTIALLY_ONLINE_INTERFACES option changes
