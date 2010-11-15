@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.9
+Version: 1.2.10
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,14 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Nov 15 2010 : Version 1.2.10
+ - Make sure to initialize the statistics start time to current time
+   instead of leaving it to point to start of epoch.
+   CQ : S1020838
+ - Create a new tunable DisableIPFailover that is used to tell ctdb
+   to not check any ip allocation at all and never do any failover
+   This can be used to stop/restart individual nodes without causing
+   any ip failovers to happen.
 * Tue Nov 2 2010 : Version 1.2.9
  - Drop loglevels on several items and remove spam from the messages file
  - Both nfs and nfslock can fail so restart both if there is a problem
