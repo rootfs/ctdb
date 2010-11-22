@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.10
+Version: 1.2.11
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,11 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Nov 22 2010 : Version 1.2.11
+ - Fix bugs in the evenstcripts where we are supposed to automatically
+   start/stop services when CTDB_MANAGES_* changes, and we were not.
+ - Change 60.nfs to allow kNFSd to have been dead for quite a long time
+   before we flag the node as unehalthy and failover.
 * Mon Nov 15 2010 : Version 1.2.10
  - Make sure to initialize the statistics start time to current time
    instead of leaving it to point to start of epoch.
