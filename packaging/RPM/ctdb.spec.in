@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.11
+Version: 1.2.12
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Nov 29 2010 : Version 1.2.12
+ - If we are no longer natgw master, tell winbind to recycle the socket.
 * Mon Nov 22 2010 : Version 1.2.11
  - Fix bugs in the evenstcripts where we are supposed to automatically
    start/stop services when CTDB_MANAGES_* changes, and we were not.
