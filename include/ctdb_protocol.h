@@ -477,7 +477,7 @@ struct ctdb_ltdb_header {
 	uint64_t rsn;
 	uint32_t dmaster;
 	uint32_t reserved1;
-	uint32_t reserved2;
+	uint32_t flags;
 };
 
 
