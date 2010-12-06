@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.13
+Version: 1.2.14
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,12 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Dec 6 2010 : Version 1.2.14
+ - detect when ip allocation is inconsistent and some hosts show -1
+   as the node for the ip.
+   cq s1021073
+ - nfs ganesha support in eventscripts
+ - remove lacount/laccessor from the ltdb header
 * Fri Dec 3 2010 : Version 1.2.13
  - Fix a bug with the script autostart feature.
    Dont try to start samba during the init event
