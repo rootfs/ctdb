@@ -21,6 +21,7 @@
 #define _CTDB_H
 
 #define CTDB_IMMEDIATE_MIGRATION	0x00000001
+#define CTDB_CALL_FLAG_VACUUM_MIGRATION	0x00000002
 struct ctdb_call {
 	int call_id;
 	TDB_DATA key;
