@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.14
+Version: 1.2.15
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,15 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Dec 13 2010 : Version 1.2.15
+ - Add two new debugging commands "ctdb readkey/writekey"
+ - idtree overflow bugfix
+ - only run "serverid wipe" when we are actually running samba
+ - libctdb, add roper input queueing so we can support calling
+   sync functions from an async callback
+ - lvs updates
+ - addip, always wait across at least one ip reallocation, making the
+   command slower, but making it easier to use in scripts
 * Mon Dec 6 2010 : Version 1.2.14
  - detect when ip allocation is inconsistent and some hosts show -1
    as the node for the ip.
