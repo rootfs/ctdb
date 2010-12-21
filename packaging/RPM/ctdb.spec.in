@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.15
+Version: 1.2.16
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,14 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Wed Dec 22 2010 : Version 1.2.16
+ - 50.samba  dont run serverid wipe in the background in case it
+   is so slow to start that samba manages to come up before it finishes.
+ - 60.nfs  wait 10 intervals before trying to restart lockd.
+   flag the node unhealthy after 15 failures.
+   CQ S1021266
+ - 41.httpd  httpd can sometimes be slow, wait 5 intervals before we try to
+   restart it and 10 intervals before we flag the node unhealthy.
 * Mon Dec 13 2010 : Version 1.2.15
  - Add two new debugging commands "ctdb readkey/writekey"
  - idtree overflow bugfix
