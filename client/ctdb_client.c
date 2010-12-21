@@ -4193,3 +4193,12 @@ int ctdb_ctrl_get_db_priority(struct ctdb_context *ctdb, struct timeval timeout,
 
 	return 0;
 }
+
+struct ctdb_ltdb_header *ctdb_header_from_record_handle(struct ctdb_record_handle *h)
+{
+	if (h == NULL) {
+		return NULL;
+	}
+
+	return &h->header;
+}
