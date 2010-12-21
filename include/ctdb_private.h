@@ -1648,4 +1648,19 @@ int ctdb_recheck_persistent_health(struct ctdb_context *ctdb);
 void ctdb_run_notification_script(struct ctdb_context *ctdb, const char *event);
 
 void ctdb_fault_setup(void);
+
+
+/**
+ * structure to pass to a schedule_for_deletion_control
+ */
+struct ctdb_control_schedule_for_deletion {
+	uint32_t db_id;
+	struct ctdb_ltdb_header hdr;
+	uint32_t keylen;
+	uint8_t key[1]; /* key[] */
+};
+
+int32_t ctdb_control_schedule_for_deletion(struct ctdb_context *ctdb,
+					   TDB_DATA indata);
+
 #endif
