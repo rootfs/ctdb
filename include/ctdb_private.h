@@ -486,6 +486,7 @@ struct ctdb_db_context {
 	bool transaction_active;
 	struct ctdb_vacuum_handle *vacuum_handle;
 	char *unhealthy_reason;
+	struct _trbt_tree_t *delete_queue;
 };
 
 
