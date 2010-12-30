@@ -488,6 +488,11 @@ struct ctdb_db_context {
 	struct ctdb_vacuum_handle *vacuum_handle;
 	char *unhealthy_reason;
 	struct _trbt_tree_t *delete_queue;
+	int (*ctdb_ltdb_store_fn)(struct ctdb_db_context *ctdb_db,
+				  TDB_DATA key,
+				  struct ctdb_ltdb_header *header,
+				  TDB_DATA data);
+
 };
 
 
