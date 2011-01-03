@@ -130,7 +130,7 @@ static int insert_delete_record_data_into_tree(struct ctdb_context *ctdb,
 
 	dd->hdr = *hdr;
 
-	hash = ctdb_hash(&key);
+	hash = (uint32_t)tdb_jenkins_hash(&key);
 
 	trbt_insert32(tree, hash, dd);
 
@@ -145,7 +145,7 @@ static int add_record_to_delete_tree(struct vacuum_data *vdata, TDB_DATA key,
 	uint32_t hash;
 	int ret;
 
-	hash = ctdb_hash(&key);
+	hash = (uint32_t)tdb_jenkins_hash(&key);
 
 	if (trbt_lookup32(vdata->delete_tree, hash)) {
 		DEBUG(DEBUG_INFO, (__location__ " Hash collission when vacuuming, skipping this record.\n"));
@@ -675,7 +675,8 @@ static int ctdb_vacuum_db(struct ctdb_db_context *ctdb_db,
 				 * that other node couldnt delete the record
 				 * so we should delete it and thereby remove it from the tree
 				 */
-				talloc_free(trbt_lookup32(vdata->delete_tree, ctdb_hash(&reckey)));
+				talloc_free(trbt_lookup32(vdata->delete_tree,
+							  (uint32_t)tdb_jenkins_hash(&reckey)));
 
 				rec = (struct ctdb_rec_data *)(rec->length + (uint8_t *)rec);
 			}	    
@@ -710,7 +711,7 @@ static int repack_traverse(struct tdb_context *tdb, TDB_DATA key, TDB_DATA data,
 	struct vacuum_data *vdata = (struct vacuum_data *)private;
 
 	if (vdata->vacuum) {
-		uint32_t hash = ctdb_hash(&key);
+		uint32_t hash = (uint32_t)tdb_jenkins_hash(&key);
 		struct delete_record_data *kd;
 		/*
 		 * check if we can ignore this record because it's in the delete_tree
@@ -1260,7 +1261,7 @@ static int insert_record_into_delete_queue(struct ctdb_db_context *ctdb_db,
 	uint32_t hash;
 	int ret;
 
-	hash = ctdb_hash(&key);
+	hash = (uint32_t)tdb_jenkins_hash(&key);
 
 	DEBUG(DEBUG_INFO, (__location__ " Schedule for deletion: db[%s] "
 			   "db_id[0x%08x] "
