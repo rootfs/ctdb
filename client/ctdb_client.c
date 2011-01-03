@@ -1928,6 +1928,7 @@ int ctdb_dumpdb_record(struct ctdb_context *ctdb, TDB_DATA key, TDB_DATA data, v
 
 	if (c->printhash) {
 		fprintf(f, "hash: 0x%08x\n", ctdb_hash(&key));
+		fprintf(f, "jenkins hash: 0x%08x\n", (uint32_t)tdb_jenkins_hash(&key));
 	}
 
 	fprintf(f, "flags: 0x%08x", h->flags);
