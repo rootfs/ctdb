@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.16
+Version: 1.2.17
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,18 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Jan 17 2011 : Version 1.2.17
+ - Updates to the event logging from Christian.
+ - Libctdb : traverse support
+ - Updates to the event logging by adding internal ticker.
+ - Addip/Delip/Moveip : make more robust by adding retry if failure
+ - Dont ban nodes for ipreallocation failures, being unhealthy is sufficient
+ - NFS eventscripts : lower the fail/restart limits
+ - Eventscript restart : only restart on monitor event.
+ - Libctdb crash issue from Mike Anderson
+ - chante daemon back to real-time process to handle high load better and reduce
+   time jumped messages.
+ - nfs eventscript : skip checking statd when running on SLES systems
 * Wed Dec 22 2010 : Version 1.2.16
  - 50.samba  dont run serverid wipe in the background in case it
    is so slow to start that samba manages to come up before it finishes.
