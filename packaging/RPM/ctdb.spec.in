@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.19
+Version: 1.2.20
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Tue Feb 8 2011 : Version 1.2.20
+ - Make addip command more robust for "slow" systems.
 * Mon Jan 31 2011 : Version 1.2.19
  - Extra logging to show why CTDB dont start if it is in STOPPED state
    CQ S1021747
