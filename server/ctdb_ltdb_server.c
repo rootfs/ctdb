@@ -750,11 +750,27 @@ again:
  */
 int32_t ctdb_control_db_attach(struct ctdb_context *ctdb, TDB_DATA indata,
 			       TDB_DATA *outdata, uint64_t tdb_flags, 
-			       bool persistent)
+			       bool persistent, uint32_t client_id)
 {
 	const char *db_name = (const char *)indata.dptr;
 	struct ctdb_db_context *db;
-	struct ctdb_node *node = ctdb->nodes[ctdb->pnn];
+	struct ctdb_node *node;
+
+	/* dont allow any local clients to attach while we are in recovery mode
+	 * except for the recovery daemon.
+	 * allow all attach from the network since these are always from remote
+	 * recovery daemons.
+	 */
+	if (ctdb->recovery_mode == CTDB_RECOVERY_ACTIVE && client_id != 0) {
+		struct ctdb_client *client = ctdb_reqid_find(ctdb, client_id, struct ctdb_client);
+
+		if (client != NULL && client->pid != ctdb->recoverd_pid) {
+			DEBUG(DEBUG_ERR,("DB Attach to database %s refused for client with pid:%d since node is in recovery mode.\n", db_name, client->pid));
+			return -1;
+		}
+	}
+
+	node = ctdb->nodes[ctdb->pnn];
 
 	/* the client can optionally pass additional tdb flags, but we
 	   only allow a subset of those on the database in ctdb. Note
