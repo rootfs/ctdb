@@ -275,7 +275,7 @@ case "$1" in
 	ip=$3
 	maskbits=$4
 
-	smbcontrol winbindd ip-dropped $ip >/dev/null 2>/dev/null
+	smbcontrol winbindd ip-dropped $ip >/dev/null 2>/dev/null &
 	;;
     *)
 	ctdb_standard_event_handler "$@"
