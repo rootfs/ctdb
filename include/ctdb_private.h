@@ -490,6 +490,7 @@ struct ctdb_db_context {
 	bool transaction_active;
 	struct ctdb_vacuum_handle *vacuum_handle;
 	char *unhealthy_reason;
+	struct ctdb_persistent_state *persistent_state;
 	struct _trbt_tree_t *delete_queue;
 	int (*ctdb_ltdb_store_fn)(struct ctdb_db_context *ctdb_db,
 				  TDB_DATA key,
