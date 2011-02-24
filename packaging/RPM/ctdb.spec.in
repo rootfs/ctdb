@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.22
+Version: 1.2.23
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Fri Feb 25 2011 : Version 1.2.23
+ - Fix for "DB Attach to database %s refused. Can not match clientid.."
+   that was introduced in 1.2.22
 * Wed Feb 23 2011 : Version 1.2.22
  - Fix transaction errors that especially happened during startup.
 * Mon Feb 21 2011 : Version 1.2.21
