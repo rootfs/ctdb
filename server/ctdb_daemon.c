@@ -695,7 +695,7 @@ static void sig_child_handler(struct event_context *ev,
 
 	while (pid != 0) {
 		pid = waitpid(-1, &status, WNOHANG);
-		if (pid == -1) {
+		if (pid == -1 && errno != ECHILD) {
 			DEBUG(DEBUG_ERR, (__location__ " waitpid() returned error. errno:%d\n", errno));
 			return;
 		}
