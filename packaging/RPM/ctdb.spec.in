@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 39
+Release: 40
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Tue Mar 1 2011 : Version 1.0.112-40
+ - Try restarting the recovery daemon when it fails.
 * Wed Oct 27 2010 : Version 1.0.112-39
  - When restarting lockmanager, also restart nfs itself in case nfs failed to 
    start.
