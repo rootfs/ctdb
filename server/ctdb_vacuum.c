@@ -122,7 +122,8 @@ static int vacuum_traverse(struct tdb_context *tdb, TDB_DATA key, TDB_DATA data,
 	}
 	       
 	lmaster = ctdb_lmaster(ctdb, &key);
-	if (lmaster >= ctdb->vnn_map->size) {
+	if (lmaster >= ctdb->num_nodes) {
+		DEBUG(DEBUG_ERR,("VACUUM TRAVERSE lmaster for record is out of bounds : %d but max allowed is %d\n", lmaster, ctdb->vnn_map->size));
 		return 0;
 	}
 
@@ -251,12 +252,12 @@ static int ctdb_vacuum_db(struct ctdb_db_context *ctdb_db, struct vacuum_data *v
 
 	ctdb->pnn = pnn;
 	/* the list needs to be of length num_nodes */
-	vdata->list = talloc_array(vdata, struct ctdb_marshall_buffer *, ctdb->vnn_map->size);
+	vdata->list = talloc_array(vdata, struct ctdb_marshall_buffer *, ctdb->num_nodes);
 	if (vdata->list == NULL) {
 		DEBUG(DEBUG_ERR,(__location__ " Out of memory\n"));
 		return -1;
 	}
-	for (i = 0; i < ctdb->vnn_map->size; i++) {
+	for (i = 0; i < ctdb->num_nodes; i++) {
 		vdata->list[i] = (struct ctdb_marshall_buffer *)
 			talloc_zero_size(vdata->list, 
 							 offsetof(struct ctdb_marshall_buffer, data));
@@ -277,22 +278,22 @@ static int ctdb_vacuum_db(struct ctdb_db_context *ctdb_db, struct vacuum_data *v
 		DEBUG(DEBUG_INFO,("Traverse aborted vacuuming '%s'\n", name));
 		return -1;
 	}
-	for ( i = 0; i < ctdb->vnn_map->size; i++) {
+	for (i = 0; i < ctdb->num_nodes; i++) {
 		if (vdata->list[i]->count == 0) {
 			continue;
 		}
 
 		/* for records where we are not the lmaster, tell the lmaster to fetch the record */
-		if (ctdb->vnn_map->map[i] != ctdb->pnn) {
+		if (ctdb->nodes[i]->pnn != ctdb->pnn) {
 			TDB_DATA data;
 			DEBUG(DEBUG_INFO,("Found %u records for lmaster %u in '%s'\n", 
 								vdata->list[i]->count, i, name));
 
 			data.dsize = talloc_get_size(vdata->list[i]);
 			data.dptr  = (void *)vdata->list[i];
-			if (ctdb_send_message(ctdb, ctdb->vnn_map->map[i], CTDB_SRVID_VACUUM_FETCH, data) != 0) {
+			if (ctdb_send_message(ctdb, ctdb->nodes[i]->pnn, CTDB_SRVID_VACUUM_FETCH, data) != 0) {
 				DEBUG(DEBUG_ERR,(__location__ " Failed to send vacuum fetch message to %u\n",
-					 ctdb->vnn_map->map[i]));
+					 ctdb->nodes[i]->pnn));
 				return -1;		
 			}
 			continue;
@@ -332,12 +333,15 @@ static int ctdb_vacuum_db(struct ctdb_db_context *ctdb_db, struct vacuum_data *v
 		 * now tell all the other nodes to delete all these records
 		 * (if possible)
 		 */
-		for (i = 0; i < ctdb->vnn_map->size; i++) {
+		for (i = 0; i < ctdb->num_nodes; i++) {
 			struct ctdb_marshall_buffer *records;
 			struct ctdb_rec_data *rec;
 			char c;
 
-			if (ctdb->vnn_map->map[i] == ctdb->pnn) {
+			if (ctdb->nodes[i]->flags & NODE_FLAGS_INACTIVE) {
+				continue;
+			}
+			if (ctdb->nodes[i]->pnn == ctdb->pnn) {
 				/* we dont delete the records on the local node just yet */
 				continue;
 			}
@@ -348,12 +352,12 @@ static int ctdb_vacuum_db(struct ctdb_db_context *ctdb_db, struct vacuum_data *v
 				return -1;
 			}
 
-			ret = ctdb_control(ctdb, ctdb->vnn_map->map[i], 0,
+			ret = ctdb_control(ctdb, ctdb->nodes[i]->pnn, 0,
 					CTDB_CONTROL_TRY_DELETE_RECORDS, 0,
 					indata, recs, &outdata, &res,
 					NULL, NULL);
 			if (ret != 0 || res != 0) {
-				DEBUG(DEBUG_ERR,("Failed to delete records on node %u\n", ctdb->vnn_map->map[i]));
+				DEBUG(DEBUG_ERR,("Failed to delete records on node %u\n", ctdb->nodes[i]->pnn));
 				return -1;
 			}
 
