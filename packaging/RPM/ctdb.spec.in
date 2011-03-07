@@ -5,7 +5,7 @@ Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
 Version: 1.0.112
-Release: 41
+Release: 42
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -125,6 +125,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Mon Mar 7 2011 : Version 1.0.112-42
+ - ctdb_fatal() drop all public ips or else we will get a duplicate ip ont he thetwork. CS S1022203
+ - Vacuuming, fix a bug where we would get unvacuumable records when some nodes are permanently disconnected. This leak of unvacuumable records eventually leads to ctdb shutting down. CQ S1022203
 * Fri Mar 4 2011 : Version 1.0.112-41
  - Try to restart the recovery dameon if it has hung
 * Tue Mar 1 2011 : Version 1.0.112-40
