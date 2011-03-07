@@ -63,6 +63,11 @@ static void ctdb_start_transport(struct ctdb_context *ctdb)
 		exit(11);
 	}
 
+	/* set up a function so we try to clean up during emergency shutdown such as ctdb_fatal()
+	   at the very least we should drop all ips at this stage
+	*/
+	ctdb->emergency_shutdown = ctdb_emergency_shutdown;
+
 	/* Make sure we log something when the daemon terminates */
 	atexit(print_exit_message);
 

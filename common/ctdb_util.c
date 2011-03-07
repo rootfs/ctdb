@@ -57,6 +57,9 @@ void ctdb_set_error(struct ctdb_context *ctdb, const char *fmt, ...)
 void ctdb_fatal(struct ctdb_context *ctdb, const char *msg)
 {
 	DEBUG(DEBUG_ALERT,("ctdb fatal error: %s\n", msg));
+	if (ctdb->emergency_shutdown != NULL) {
+		ctdb->emergency_shutdown(ctdb);
+	}
 	abort();
 }
 

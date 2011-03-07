@@ -474,6 +474,9 @@ struct ctdb_context {
 
 	/* used in the recovery daemon to remember the ip allocation */
 	struct trbt_tree *ip_tree;
+
+	/* emergency shutdown cleanup */
+	void (*emergency_shutdown)(struct ctdb_context *);
 };
 
 struct ctdb_db_context {
@@ -1575,5 +1578,7 @@ int verify_remote_ip_allocation(struct ctdb_context *ctdb,
 				struct ctdb_all_public_ips *ips);
 int update_ip_assignment_tree(struct ctdb_context *ctdb,
 				struct ctdb_public_ip *ip);
+
+void ctdb_emergency_shutdown(struct ctdb_context *ctdb);
 
 #endif

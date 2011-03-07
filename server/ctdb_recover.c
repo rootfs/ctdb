@@ -1262,3 +1262,14 @@ int32_t ctdb_control_continue_node(struct ctdb_context *ctdb)
 
 	return 0;
 }
+
+void ctdb_emergency_shutdown(struct ctdb_context *ctdb)
+{
+	DEBUG(DEBUG_ERR,("CTDB_FATAL create child process to release all held ips\n"));
+	if (fork() == 0) {
+		DEBUG(DEBUG_ERR,("CTDB_FATAL drop all ip\n"));
+		ctdb_release_all_ips(ctdb);
+		DEBUG(DEBUG_ERR,("CTDB_FATAL all ips dropped\n"));
+		_exit(0);
+	}
+}
