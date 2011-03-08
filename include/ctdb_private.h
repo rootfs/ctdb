@@ -645,6 +645,8 @@ enum ctdb_controls {CTDB_CONTROL_PROCESS_EXISTS          = 0,
 		    CTDB_CONTROL_GET_PUBLIC_IP_INFO	 = 123,
 		    CTDB_CONTROL_GET_IFACES		 = 124,
 		    CTDB_CONTROL_SET_IFACE_LINK_STATE	 = 125,
+		    /* 126 & 127: skipped (master...) */
+		    CTDB_CONTROL_SCHEDULE_FOR_DELETION   = 128,
 };	
 
 /*
