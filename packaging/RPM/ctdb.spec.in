@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.24
+Version: 1.2.25
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,11 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Mar 14 2011 : Version 1.2.25
+ - Vacuum update. Vacuuming updated from Michael Adam's vacuuming patch which
+   greatly improves the speed of vacuuming of shortlived records.
+ - Defer database access until we have well gone through initial startup and covergence. This reduces the chance of hitting a split brain when writing to the cluster if we dont use split brain protection reclock file.
+ - Try to restart recovery daemon if/when it fails or hangs.
 * Fri Feb 25 2011 : Version 1.2.23
  - Fix for "DB Attach to database %s refused. Can not match clientid.."
    that was introduced in 1.2.22
