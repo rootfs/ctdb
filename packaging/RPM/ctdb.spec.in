@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.26
+Version: 1.2.27
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -143,6 +143,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Mar 21 2011 : Version 1.2.27
+ - Fix a tdb_lock all bug in the ctdb_req_dmaster from non-master code.
+   CQ S1022545
 * Mon Mar 21 2011 : Version 1.2.26
  - Fix a talloc hierarchy bug for the deferred attach context
    CQ S1022515
