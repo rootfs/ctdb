@@ -1,13 +1,22 @@
 '\" t
 .\"     Title: ctdb
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
-.\" Generator: DocBook XSL Stylesheets v1.75.1 <http://docbook.sf.net/>
-.\"      Date: 02/24/2010
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+.\"      Date: 01/12/2012
 .\"    Manual: CTDB - clustered TDB database
 .\"    Source: ctdb
 .\"  Language: English
 .\"
-.TH "CTDB" "1" "02/24/2010" "ctdb" "CTDB \- clustered TDB database"
+.TH "CTDB" "1" "01/12/2012" "ctdb" "CTDB \- clustered TDB database"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
 .\" -----------------------------------------------------------------
 .\" * set default formatting
 .\" -----------------------------------------------------------------
@@ -407,12 +416,12 @@ Example output:
 .PP
 This command is used to disable an eventscript\&.
 .PP
-This will take effect the next time the eventscripts are being executed so it can take a short while until this is reflected in \'scriptstatus\'\&.
+This will take effect the next time the eventscripts are being executed so it can take a short while until this is reflected in \*(Aqscriptstatus\*(Aq\&.
 .SS "enablescript <script>"
 .PP
 This command is used to enable an eventscript\&.
 .PP
-This will take effect the next time the eventscripts are being executed so it can take a short while until this is reflected in \'scriptstatus\'\&.
+This will take effect the next time the eventscripts are being executed so it can take a short while until this is reflected in \*(Aqscriptstatus\*(Aq\&.
 .SS "getvar <name>"
 .PP
 Get the runtime value of a tuneable variable\&.
@@ -706,29 +715,29 @@ This command is used when adding new nodes, or removing existing nodes from an e
 .PP
 Procedure to add a node:
 .PP
-1, To expand an existing cluster, first ensure with \'ctdb status\' that all nodes are up and running and that they are all healthy\&. Do not try to expand a cluster unless it is completely healthy!
+1, To expand an existing cluster, first ensure with \*(Aqctdb status\*(Aq that all nodes are up and running and that they are all healthy\&. Do not try to expand a cluster unless it is completely healthy!
 .PP
 2, On all nodes, edit /etc/ctdb/nodes and add the new node as the last entry to the file\&. The new node MUST be added to the end of this file!
 .PP
 3, Verify that all the nodes have identical /etc/ctdb/nodes files after you edited them and added the new node!
 .PP
-4, Run \'ctdb reloadnodes\' to force all nodes to reload the nodesfile\&.
+4, Run \*(Aqctdb reloadnodes\*(Aq to force all nodes to reload the nodesfile\&.
 .PP
-5, Use \'ctdb status\' on all nodes and verify that they now show the additional node\&.
+5, Use \*(Aqctdb status\*(Aq on all nodes and verify that they now show the additional node\&.
 .PP
 6, Install and configure the new node and bring it online\&.
 .PP
 Procedure to remove a node:
 .PP
-1, To remove a node from an existing cluster, first ensure with \'ctdb status\' that all nodes, except the node to be deleted, are up and running and that they are all healthy\&. Do not try to remove a node from a cluster unless the cluster is completely healthy!
+1, To remove a node from an existing cluster, first ensure with \*(Aqctdb status\*(Aq that all nodes, except the node to be deleted, are up and running and that they are all healthy\&. Do not try to remove a node from a cluster unless the cluster is completely healthy!
 .PP
 2, Shutdown and poerwoff the node to be removed\&.
 .PP
-3, On all other nodes, edit the /etc/ctdb/nodes file and comment out the node to be removed\&. Do not delete the line for that node, just comment it out by adding a \'#\' at the beginning of the line\&.
+3, On all other nodes, edit the /etc/ctdb/nodes file and comment out the node to be removed\&. Do not delete the line for that node, just comment it out by adding a \*(Aq#\*(Aq at the beginning of the line\&.
 .PP
-4, Run \'ctdb reloadnodes\' to force all nodes to reload the nodesfile\&.
+4, Run \*(Aqctdb reloadnodes\*(Aq to force all nodes to reload the nodesfile\&.
 .PP
-5, Use \'ctdb status\' on all nodes and verify that the deleted node no longer shows up in the list\&.\&.
+5, Use \*(Aqctdb status\*(Aq on all nodes and verify that the deleted node no longer shows up in the list\&.\&.
 .PP
 .SS "tickle <srcip:port> <dstip:port>"
 .PP
@@ -777,7 +786,7 @@ This command can be used to remove all content of a database\&.
 .PP
 In addition to the normal loggign to a log file, CTDBD also keeps a in\-memory ringbuffer containing the most recent log entries for all log levels (except DEBUG)\&.
 .PP
-This is useful since it allows for keeping continous logs to a file at a reasonable non\-verbose level, but shortly after an incident has occured, a much more detailed log can be pulled from memory\&. This can allow you to avoid having to reproduce an issue due to the on\-disk logs being of insufficient detail\&.
+This is useful since it allows for keeping continuous logs to a file at a reasonable non\-verbose level, but shortly after an incident has occured, a much more detailed log can be pulled from memory\&. This can allow you to avoid having to reproduce an issue due to the on\-disk logs being of insufficient detail\&.
 .PP
 This command extracts all messages of level or lower log level from memory and prints it to the screen\&.
 .SS "clearlog"
@@ -793,7 +802,7 @@ This command checks if a specific process exists on the CTDB host\&. This is mai
 .PP
 This command lists all clustered TDB databases that the CTDB daemon has attached to\&. Some databases are flagged as PERSISTENT, this means that the database stores data persistently and the data will remain across reboots\&. One example of such a database is secrets\&.tdb where information about how the cluster was joined to the domain is stored\&.
 .PP
-If a PERSISTENT database is not in a healthy state the database is flagged as UNHEALTHY\&. If there\'s at least one completely healthy node running in the cluster, it\'s possible that the content is restored by a recovery run automaticly\&. Otherwise an administrator needs to analyze the problem\&.
+If a PERSISTENT database is not in a healthy state the database is flagged as UNHEALTHY\&. If there\*(Aqs at least one completely healthy node running in the cluster, it\*(Aqs possible that the content is restored by a recovery run automaticly\&. Otherwise an administrator needs to analyze the problem\&.
 .PP
 See also "ctdb getdbstatus", "ctdb backupdb", "ctdb restoredb", "ctdb dumpbackup", "ctdb wipedb", "ctdb setvar AllowUnhealthyDBRead 1" and (if samba or tdb\-utils are installed) "tdbtool check"\&.
 .PP
@@ -886,7 +895,7 @@ dbid: 0xf2a58948
 name: registry\&.tdb
 path: /var/ctdb/persistent/registry\&.tdb\&.0
 PERSISTENT: yes
-HEALTH: NO\-HEALTHY\-NODES \- ERROR \- Backup of corrupted TDB in \'/var/ctdb/persistent/registry\&.tdb\&.0\&.corrupted\&.20091208091949\&.0Z\'
+HEALTH: NO\-HEALTHY\-NODES \- ERROR \- Backup of corrupted TDB in \*(Aq/var/ctdb/persistent/registry\&.tdb\&.0\&.corrupted\&.20091208091949\&.0Z\*(Aq
       
 .fi
 .if n \{\
@@ -900,7 +909,7 @@ This command will dump a clustered TDB database to the screen\&. This is a debug
 This command will dump the content of database backup to the screen (similar to ctdb catdb)\&. This is a debugging command\&.
 .SS "getmonmode"
 .PP
-This command returns the monutoring mode of a node\&. The monitoring mode is either ACTIVE or DISABLED\&. Normally a node will continously monitor that all other nodes that are expected are in fact connected and that they respond to commands\&.
+This command returns the monutoring mode of a node\&. The monitoring mode is either ACTIVE or DISABLED\&. Normally a node will continuously monitor that all other nodes that are expected are in fact connected and that they respond to commands\&.
 .PP
 ACTIVE \- This is the normal mode\&. The node is actively monitoring all other nodes, both that the transport is connected and also that the node responds to commands\&. If a node becomes unavailable, it will be marked as DISCONNECTED and a recovery is initiated to restore the cluster\&.
 .PP

@@ -1,13 +1,22 @@
 '\" t
 .\"     Title: ctdbd
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
-.\" Generator: DocBook XSL Stylesheets v1.75.1 <http://docbook.sf.net/>
-.\"      Date: 02/24/2010
+.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
+.\"      Date: 01/10/2012
 .\"    Manual: CTDB - clustered TDB database
 .\"    Source: ctdb
 .\"  Language: English
 .\"
-.TH "CTDBD" "1" "02/24/2010" "ctdb" "CTDB \- clustered TDB database"
+.TH "CTDBD" "1" "01/10/2012" "ctdb" "CTDB \- clustered TDB database"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
 .\" -----------------------------------------------------------------
 .\" * set default formatting
 .\" -----------------------------------------------------------------
@@ -118,7 +127,7 @@ This is a ctdbd debugging option\&. this option is only used when debugging ctdb
 .sp
 Normally ctdb will change its scheduler to run as a real\-time process\&. This is the default mode for a normal ctdbd operation to gurarantee that ctdbd always gets the cpu cycles that it needs\&.
 .sp
-This option is used to tell ctdbd to NOT run as a real\-time process and instead run ctdbd as a normal userspace process\&. This is useful for debugging and when you want to run ctdbd under valgrind or gdb\&. (You don\'t want to attach valgrind or gdb to a real\-time process\&.)
+This option is used to tell ctdbd to NOT run as a real\-time process and instead run ctdbd as a normal userspace process\&. This is useful for debugging and when you want to run ctdbd under valgrind or gdb\&. (You don\*(Aqt want to attach valgrind or gdb to a real\-time process\&.)
 .RE
 .PP
 \-\-notification\-script=<filename>
@@ -141,7 +150,7 @@ This is usually the file /etc/ctdb/public_addresses
 .RS 4
 This option tells ctdb which interface to attach public\-addresses to and also where to attach the single\-public\-ip when used\&.
 .sp
-This is only required when using public ip addresses and only when you don\'t specify the interface explicitly in /etc/ctdb/public_addresses or when you are using \-\-single\-public\-ip\&.
+This is only required when using public ip addresses and only when you don\*(Aqt specify the interface explicitly in /etc/ctdb/public_addresses or when you are using \-\-single\-public\-ip\&.
 .sp
 If you omit this argument when using public addresses or single public ip, ctdb will not be able to send out Gratious ARPs correctly or be able to kill tcp connections correctly which will lead to application failures\&.
 .RE
@@ -191,7 +200,7 @@ Send all log messages to syslog instead of to the ctdb logfile\&.
 .RS 4
 In addition to the normal loggign to a log file, CTDBD also keeps a in\-memory ringbuffer containing the most recent log entries for all log levels (except DEBUG)\&.
 .sp
-This is useful since it allows for keeping continous logs to a file at a reasonable non\-verbose level, but shortly after an incident has occured, a much more detailed log can be pulled from memory\&. This can allow you to avoid having to reproduce an issue due to the on\-disk logs being of insufficient detail\&.
+This is useful since it allows for keeping continuous logs to a file at a reasonable non\-verbose level, but shortly after an incident has occured, a much more detailed log can be pulled from memory\&. This can allow you to avoid having to reproduce an issue due to the on\-disk logs being of insufficient detail\&.
 .sp
 This in\-memory ringbuffer contains a fixed number of the most recent entries\&. This is settable at startup either through the \-\-log\-ringbuf\-size argument, or preferably by using CTDB_LOG_RINGBUF_SIZE in the sysconfig file\&.
 .sp
@@ -251,7 +260,7 @@ A public address on the other hand is not attached to an interface\&. This addre
 .PP
 The ctdb cluster will assign/reassign these public addresses across the available healthy nodes in the cluster\&. When one node fails, its public address will be migrated to and taken over by a different node in the cluster to ensure that all public addresses are always available to clients as long as there are still nodes available capable of hosting this address\&.
 .PP
-These addresses are not physically attached to a specific node\&. The \'ctdb ip\' command can be used to view the current assignment of public addresses and which physical node is currently serving it\&.
+These addresses are not physically attached to a specific node\&. The \*(Aqctdb ip\*(Aq command can be used to view the current assignment of public addresses and which physical node is currently serving it\&.
 .PP
 On each node this file contains a list of the public addresses that this node is capable of hosting\&. The list also contain the netmask and the interface where this address should be attached for the case where you may want to serve data out through multiple different interfaces\&.
 
@@ -307,7 +316,7 @@ In this example nodes 0 and 1 host two public addresses on the 10\&.1\&.1\&.x ne
 Ip address 10\&.1\&.1\&.1 can be hosted by either of nodes 0 or 1 and will be available to clients as long as at least one of these two nodes are available\&. If both nodes 0 and node 1 become unavailable 10\&.1\&.1\&.1 also becomes unavailable\&. 10\&.1\&.1\&.1 can not be failed over to node 2 or node 3 since these nodes do not have this ip address listed in their public addresses file\&.
 .SH "NODE STATUS"
 .PP
-The current status of each node in the cluster can be viewed by the \'ctdb status\' command\&.
+The current status of each node in the cluster can be viewed by the \*(Aqctdb status\*(Aq command\&.
 .PP
 There are five possible states for a node\&.
 .PP
@@ -354,7 +363,7 @@ How long should ctdb let an event script run before aborting it and marking the 
 .PP
 Default: 300
 .PP
-If a node becomes banned causing repetitive recovery failures\&. The node will eventually become banned from the cluster\&. This controls how long the culprit node will be banned from the cluster before it is allowed to try to join the cluster again\&. Don\'t set to small\&. A node gets banned for a reason and it is usually due to real problems with the node\&.
+If a node becomes banned causing repetitive recovery failures\&. The node will eventually become banned from the cluster\&. This controls how long the culprit node will be banned from the cluster before it is allowed to try to join the cluster again\&. Don\*(Aqt set to small\&. A node gets banned for a reason and it is usually due to real problems with the node\&.
 .SS "DatabaseHashSize"
 .PP
 Default: 100000
@@ -369,7 +378,7 @@ Once a recovery has completed, no additional recoveries are permitted until this
 .PP
 Default: 1
 .PP
-When set to 0, this disables BANNING completely in the cluster and thus nodes can not get banned, even it they break\&. Don\'t set to 0\&.
+When set to 0, this disables BANNING completely in the cluster and thus nodes can not get banned, even it they break\&. Don\*(Aqt set to 0\&.
 .SS "DeterministicIPs"
 .PP
 Default: 1
@@ -381,7 +390,7 @@ The cost of using deterministic IP address assignment is that it disables part o
 .PP
 Default: 0
 .PP
-When set, As soon as a node becomes unhealthy, that node will also automatically become permanently DISABLED\&. Once a node is DISABLED, the only way to make it participate in the cluster again and host services is by manually enabling the node again using \'ctdb enable\'\&.
+When set, As soon as a node becomes unhealthy, that node will also automatically become permanently DISABLED\&. Once a node is DISABLED, the only way to make it participate in the cluster again and host services is by manually enabling the node again using \*(Aqctdb enable\*(Aq\&.
 .PP
 This disables parts of the resilience and robustness of the cluster and should ONLY be used when the system administrator is actively monitoring the cluster, so that nodes can be enabled again\&.
 .SS "NoIPFailback"
@@ -392,7 +401,7 @@ When set to 1, ctdb will not perform failback of IP addresses when a node become
 .PP
 Use with caution! Normally when a node becomes available to the cluster ctdb will try to reassign public IP addresses onto the new node as a way to distribute the workload evenly across the clusternode\&. Ctdb tries to make sure that all running nodes have approximately the same number of public addresses it hosts\&.
 .PP
-When you enable this tunable, CTDB will no longer attempt to rebalance the cluster by failing IP addresses back to the new nodes\&. An unbalanced cluster will therefore remain unbalanced until there is manual intervention from the administrator\&. When this parameter is set, you can manually fail public IP addresses over to the new node(s) using the \'ctdb moveip\' command\&.
+When you enable this tunable, CTDB will no longer attempt to rebalance the cluster by failing IP addresses back to the new nodes\&. An unbalanced cluster will therefore remain unbalanced until there is manual intervention from the administrator\&. When this parameter is set, you can manually fail public IP addresses over to the new node(s) using the \*(Aqctdb moveip\*(Aq command\&.
 .SH "LVS"
 .PP
 LVS is a mode where CTDB presents one single IP address for the entire cluster\&. This is an alternative to using public IP addresses and round\-robin DNS to loadbalance clients across the cluster\&.
@@ -426,7 +435,7 @@ Note: you can use LVS and public addresses at the same time\&.
 .PP
 To activate LVS on a CTDB node you must specify CTDB_PUBLIC_INTERFACE and CTDB_LVS_PUBLIC_ADDRESS in /etc/sysconfig/ctdb\&.
 .PP
-You must also specify the "\-\-lvs" command line argument to ctdbd to activete LVS as a capability of the node\&. This should be done automatically for you by the /etc/init\&.d/ctdb script\&.
+You must also specify the "\-\-lvs" command line argument to ctdbd to activate LVS as a capability of the node\&. This should be done automatically for you by the /etc/init\&.d/ctdb script\&.
 .PP
 Example:
 .sp
@@ -574,7 +583,7 @@ If you want to remove NATGW completely from a node, use these steps:
 .RS 4
 .\}
 .nf
-1, Run \'CTDB_BASE=/etc/ctdb /etc/ctdb/events\&.d/11\&.natgw removenatgw\'
+1, Run \*(AqCTDB_BASE=/etc/ctdb /etc/ctdb/events\&.d/11\&.natgw removenatgw\*(Aq
 2, Then remove the configuration from /etc/sysconfig/ctdb
     
 .fi
@@ -588,9 +597,9 @@ If you want to change the NATGW configuration on a node :
 .RS 4
 .\}
 .nf
-1, Run \'CTDB_BASE=/etc/ctdb /etc/ctdb/events\&.d/11\&.natgw removenatgw\'
+1, Run \*(AqCTDB_BASE=/etc/ctdb /etc/ctdb/events\&.d/11\&.natgw removenatgw\*(Aq
 2, Then change the configuration in /etc/sysconfig/ctdb
-3, Run \'CTDB_BASE=/etc/ctdb /etc/ctdb/events\&.d/11\&.natgw updatenatgw\'
+3, Run \*(AqCTDB_BASE=/etc/ctdb /etc/ctdb/events\&.d/11\&.natgw updatenatgw\*(Aq
     
 .fi
 .if n \{\
