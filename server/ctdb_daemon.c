@@ -50,7 +50,7 @@ static void ctdb_time_tick(struct event_context *ev, struct timed_event *te,
 {
 	struct ctdb_context *ctdb = talloc_get_type(private_data, struct ctdb_context);
 
-	if (getpid() != ctdbd_pid) {
+	if (getpid() != ctdb->ctdbd_pid) {
 		return;
 	}
 
@@ -776,11 +776,10 @@ int ctdb_start_daemon(struct ctdb_context *ctdb, bool do_fork, bool use_syslog, 
 	}
 	block_signal(SIGPIPE);
 
-	ctdbd_pid = getpid();
-	ctdb->ctdbd_pid = ctdbd_pid;
+	ctdb->ctdbd_pid = getpid();
 
 
-	DEBUG(DEBUG_ERR, ("Starting CTDBD as pid : %u\n", ctdbd_pid));
+	DEBUG(DEBUG_ERR, ("Starting CTDBD as pid : %u\n", ctdb->ctdbd_pid));
 
 	if (ctdb->do_setsched) {
 		/* try to set us up as realtime */
