@@ -1691,6 +1691,10 @@ int32_t ctdb_local_schedule_for_deletion(struct ctdb_db_context *ctdb_db,
 					 const struct ctdb_ltdb_header *hdr,
 					 TDB_DATA key);
 
+void ctdb_local_remove_from_delete_queue(struct ctdb_db_context *ctdb_db,
+					 const struct ctdb_ltdb_header *hdr,
+					 const TDB_DATA key);
+
 struct ctdb_ltdb_header *ctdb_header_from_record_handle(struct ctdb_record_handle *h);
 
 #endif
