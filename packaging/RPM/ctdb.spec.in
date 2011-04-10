@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.27
-Release: 1GITHASH
+Release: 2GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -143,6 +143,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Apr 11 2011 : Version 1.2.27-2
+ - Update and simplify handling of interfaces.
+   check for and become unhealthy if an interface has been deleted
 * Mon Mar 21 2011 : Version 1.2.27
  - Fix a tdb_lock all bug in the ctdb_req_dmaster from non-master code.
    CQ S1022545
