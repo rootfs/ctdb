@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.28
+Version: 1.2.29
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -142,6 +142,15 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Tue May 10 2011 : Version 1.2.29
+ - Add workaround to RHEL5.5 kernel bug with how it reports bond interface
+   status when mode 4 is used.
+ - Remove some log messages that fill up syslog  CQ S1023302
+ - Dont call UPDATE event if the interface didnt change. This only causes a lot of i
+   spam in the syslog  S1018175
+ - Remove log messages that are benign and can be ignored  S1023378
+ - If "service smb start" fails, make the whole startup event fail so that
+   we retry to start samba again later. CQ S1023394
 * Mon Apr 11 2011 : Version 1.2.28
  - Update how we handle interface link status
    also check for and become unhealthy if an interface has been deleted
