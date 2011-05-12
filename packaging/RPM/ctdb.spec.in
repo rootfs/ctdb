@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.27
-Release: 2GITHASH
+Release: PTF1_1GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -143,6 +143,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu May 12 2011 : Version 1.2.27-PTF1-1
+ - workaround for VLAN issue CQ S1023538
+ - fix for vlan issue CQ S1023420
 * Mon Apr 11 2011 : Version 1.2.27-2
  - Update and simplify handling of interfaces.
    check for and become unhealthy if an interface has been deleted
