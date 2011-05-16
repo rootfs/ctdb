@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.27
-Release: 3GITHASH
+Release: 200GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -143,6 +143,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Tue May 17 2011 : Version 1.2.27-200
+ - rename to -200  so we leave some space for non-collission with the PTF1
+   branch
 * Tue May 10 2011 : Version 1.2.27-3
  - Add support for bonding mode 4, workaround thel5 kernel bug
  - Restart samba if it fails 'service smb start' CQ S1023394
