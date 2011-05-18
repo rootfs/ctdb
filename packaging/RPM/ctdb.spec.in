@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.27
-Release: 3GITHASH
+Release: 4GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -143,6 +143,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu May 19 2011 : Version 1.2.27-4
+ - workaround for rhel5.x kernel bug in bonding driver for mode 4
 * Tue May 17 2011 : Version 1.2.27-3
  - Rename release to 1.2.27-3
 * Thu May 12 2011 : Version 1.2.27-PTF1-1
