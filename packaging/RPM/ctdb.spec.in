@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
-Version: 1.0.114
+Version: 1.0.114.2
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -127,6 +127,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Fri May 20 2011 : Version 1.0.114.2
+ - new series of releases based off 1.0.114
+ - Stefan Metzmacher: robustness fixes for banning/recovery lock
+ - Stefan Metzmacher: fixes for per-ip-routing
+ - Ronnie Sahlberg: always migrate a record in a ctdb call
+ - Michael Adam: Test program fixes
+ - Michael Adam and Stefan Metzmacher: vacuuming rewrite
+ - Stefan Metzmacher: upgrade tdb version to master
+ - Stefan Metzmacher: re-install handling of timeout of event scripts
+ - Gregor Beck: add ltdbtool
+ - Michael Adam: packaging fixes
 * Wed Mar 25 2010 : Version 1.0.114
  - Lots of changes from Metze
 * Wed Jan 13 2010 : Version 1.0.113
