@@ -444,9 +444,17 @@ static void ctdb_event_script_handler(struct event_context *ev, struct fd_event 
 {
 	struct ctdb_event_script_state *state = 
 		talloc_get_type(p, struct ctdb_event_script_state);
-	struct ctdb_script_wire *current = get_current_script(state);
-	struct ctdb_context *ctdb = state->ctdb;
+	struct ctdb_script_wire *current;
+	struct ctdb_context *ctdb;
 	int r, status;
+
+	if (state == NULL) {
+		DEBUG(DEBUG_ERR,("state is NULL in ctdb_event_script_handler\n"));
+		return;
+	}
+
+	current = get_current_script(state);
+	ctdb = state->ctdb;
 
 	r = read(state->fd[0], &current->status, sizeof(current->status));
 	if (r < 0) {
