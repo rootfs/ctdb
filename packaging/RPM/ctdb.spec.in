@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.27
-Release: 200GITHASH
+Release: 201GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -143,6 +143,16 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon May 30 2011 : Version 1.2.27-201
+ - Remove collection of GPFS data from ctdb-diagnostics
+   S1023524
+ - Always try to restore all routes regardless of which (VLAN) interface
+   that addresses were added/removed from.
+   S1023538
+ - Verify a pointer before dereference
+   S1023707
+ - Restart samba if it failed to start
+   S1023394
 * Tue May 17 2011 : Version 1.2.27-200
  - rename to -200  so we leave some space for non-collission with the PTF1
    branch
