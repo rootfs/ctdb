@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.29
+Version: 1.2.30
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,12 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon May 30 2011 : Version 1.2.30
+ - Add LDBTOOL
+ - workaround funky vlan issue with kernel dropping routes
+   S1023538
+ - remove collection of gpfs data from ctdb-diagnostics
+   S1023524
 * Tue May 10 2011 : Version 1.2.29
  - Add workaround to RHEL5.5 kernel bug with how it reports bond interface
    status when mode 4 is used.
