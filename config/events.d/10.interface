@@ -42,7 +42,6 @@ monitor_interfaces()
 	for IFACE in $INTERFACES ; do
 
 	    ip addr show $IFACE 2>/dev/null >/dev/null || {
-		echo Interface $IFACE does not exist but it is used by public addresses.
 		continue
 	    }
 
