@@ -2972,6 +2972,13 @@ again:
 	}
 	nodemap = rec->nodemap;
 
+	/* update the capabilities for all nodes */
+	ret = update_capabilities(ctdb, nodemap);
+	if (ret != 0) {
+		DEBUG(DEBUG_ERR, (__location__ " Unable to update node capabilities.\n"));
+		goto again;
+	}
+
 	/* check which node is the recovery master */
 	ret = ctdb_ctrl_getrecmaster(ctdb, mem_ctx, CONTROL_TIMEOUT(), pnn, &rec->recmaster);
 	if (ret != 0) {
@@ -2993,7 +3000,6 @@ again:
 		force_election(rec, pnn, nodemap);
 		goto again;
 	}
-
 
 	/* if the local daemon is STOPPED, we verify that the databases are
 	   also frozen and thet the recmode is set to active 
@@ -3029,6 +3035,21 @@ again:
 		goto again;
 	}
 	
+	/*
+	 * if the current recmaster do not have CTDB_CAP_RECMASTER,
+	 * but we have force an election and try to become the new
+	 * recmaster
+	 */
+	if ((rec->ctdb->nodes[rec->recmaster]->capabilities & CTDB_CAP_RECMASTER) == 0 &&
+	    (rec->ctdb->capabilities & CTDB_CAP_RECMASTER) &&
+	     !(nodemap->nodes[pnn].flags & NODE_FLAGS_INACTIVE)) {
+		DEBUG(DEBUG_ERR, (__location__ " Current recmaster node %u does not have CAP_RECMASTER,"
+				  " but we (node %u) have - force an election\n",
+				  rec->recmaster, pnn));
+		force_election(rec, pnn, nodemap);
+		goto again;
+	}
+
 	/* check that we (recovery daemon) and the local ctdb daemon
 	   agrees on whether we are banned or not
 	*/
