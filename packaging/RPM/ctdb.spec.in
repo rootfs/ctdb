@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.27
-Release: 201GITHASH
+Release: 202GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -143,6 +143,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Jun 27 2011 : Version 1.2.27-202
+ - Remove an annoying log message
+   S1024495
 * Mon May 30 2011 : Version 1.2.27-201
  - Remove collection of GPFS data from ctdb-diagnostics
    S1023524
