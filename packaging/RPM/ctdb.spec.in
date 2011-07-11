@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.30
+Version: 1.2.31
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,18 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Jul 11 2011 : Version 1.2.31
+ - Add extra logging to the debug commands "wipedb" and "backupdb"
+ - Try numips+5 times when rebalancing ips.
+ - Change the name for hte key where we store the public address config.
+   S1019030
+ - Remove benign log message
+   S1024495
+ - Fix that 'onnode con ...' works
+   S1024277
+ - Add extra debug to netstat to capture a bug where samba drops off the
+   netstat output.
+   S1024874
 * Mon May 30 2011 : Version 1.2.30
  - Add LDBTOOL
  - workaround funky vlan issue with kernel dropping routes
