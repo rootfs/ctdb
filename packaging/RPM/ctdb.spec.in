@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
-Version: 1.0.114.2
+Version: 1.0.114.3
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -127,6 +127,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Wed Jul 13 2011 : Version 1.0.114.3
+ - Stefan Metzmacher: make sure the recovery master has CTDB_CAP_RECMASTER
 * Fri May 20 2011 : Version 1.0.114.2
  - new series of releases based off 1.0.114
  - Stefan Metzmacher: robustness fixes for banning/recovery lock
