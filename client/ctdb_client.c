@@ -1898,6 +1898,11 @@ int ctdb_dumpdb_record(struct ctdb_context *ctdb, TDB_DATA key, TDB_DATA data, v
 
 	fprintf(f, "dmaster: %u\n", h->dmaster);
 	fprintf(f, "rsn: %llu\n", (unsigned long long)h->rsn);
+	fprintf(f, "flags: 0x%08x", h->flags);
+	if (h->flags & CTDB_REC_FLAG_MIGRATED_WITH_DATA) printf(" MIGRATED_WITH_DATA");
+	if (h->flags & CTDB_REC_FLAG_VACUUM_MIGRATED) printf(" VACUUM_MIGRATED");
+	if (h->flags & CTDB_REC_FLAG_AUTOMATIC) printf(" AUTOMATIC");
+	fprintf(f, "\n");
 
 	fprintf(f, "data(%u) = \"", (unsigned)(data.dsize - sizeof(*h)));
 	for (i=sizeof(*h);i<data.dsize;i++) {
