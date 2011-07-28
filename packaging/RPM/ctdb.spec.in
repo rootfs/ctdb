@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.27
-Release: 203GITHASH
+Release: 204GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -143,6 +143,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Fri Jul 29 2011 : Version 1.2.27-204
+ - ctdb delip updates.  CQ S1026664
 * Mon Jul 25 2011 : Version 1.2.27-203
  - Fix a bug with the talloc hierarchy when running takeip/releaseip eventscripts
    and talloc_free(vnn)-ing

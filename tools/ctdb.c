@@ -1827,6 +1827,13 @@ static int control_delip(struct ctdb_context *ctdb, int argc, const char **argv)
 		return -1;
 	}
 
+	ret = ctdb_ctrl_del_public_ip(ctdb, TIMELIMIT(), options.pnn, &pub);
+	if (ret != 0) {
+		DEBUG(DEBUG_ERR, ("Unable to del public ip from node %u\n", options.pnn));
+		talloc_free(tmp_ctx);
+		return ret;
+	}
+
 	if (ips->ips[i].pnn == options.pnn) {
 		ret = find_other_host_for_public_ip(ctdb, &addr);
 		if (ret != -1) {
@@ -1840,16 +1847,9 @@ static int control_delip(struct ctdb_context *ctdb, int argc, const char **argv)
 			} while (retries < 5 && ret != 0);
 			if (ret != 0) {
 				DEBUG(DEBUG_ERR,("Failed to move ip to node %d. Giving up.\n", options.pnn));
-				return -1;
+				return 0;
 			}
 		}
-	}
-
-	ret = ctdb_ctrl_del_public_ip(ctdb, TIMELIMIT(), options.pnn, &pub);
-	if (ret != 0) {
-		DEBUG(DEBUG_ERR, ("Unable to del public ip from node %u\n", options.pnn));
-		talloc_free(tmp_ctx);
-		return ret;
 	}
 
 	talloc_free(tmp_ctx);
