@@ -286,6 +286,10 @@ CTDB_DEBUGLEVEL=ERR
 # This parameter controls how many entries we allow for this in memory log
 # CTDB_LOG_RINGBUF_SIZE=500000
 
+# Should CTDB automatically start and stop services when it is told to
+# newly manage or no longer manage them?
+CTDB_SERVICE_AUTOSTARTSTOP=yes
+
 # 
 #
 # set any default tuning options for ctdb
