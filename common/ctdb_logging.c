@@ -124,7 +124,7 @@ static void ctdb_collect_log(struct ctdb_context *ctdb, struct ctdb_get_log_addr
 		tm = localtime(&log_entries[tmp_entry].t.tv_sec);
 		strftime(tbuf, sizeof(tbuf)-1,"%Y/%m/%d %H:%M:%S", tm);
 
-		if (log_entries[tmp_entry].message) {
+		if (log_entries[tmp_entry].message[0] != '\0') {
 			count += fprintf(f, "%s:%s %s", tbuf, get_debug_by_level(log_entries[tmp_entry].level), log_entries[tmp_entry].message);
 		}
 
@@ -135,9 +135,17 @@ static void ctdb_collect_log(struct ctdb_context *ctdb, struct ctdb_get_log_addr
 	}
 
 	fsize = ftell(f);
+	if (fsize < 0) {
+		fclose(f);
+		DEBUG(DEBUG_ERR,("Cannot get current file position\n"));
+                return;
+	}
 	rewind(f);
 	data.dptr = talloc_size(NULL, fsize);
-	CTDB_NO_MEMORY_VOID(ctdb, data.dptr);
+	if (data.dptr == NULL) {
+		fclose(f);
+		CTDB_NO_MEMORY_VOID(ctdb, data.dptr);
+	}
 	data.dsize = fread(data.dptr, 1, fsize, f);
 	fclose(f);
 

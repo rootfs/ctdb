@@ -222,6 +222,7 @@ static struct ctdb_scripts_wire *ctdb_get_script_list(struct ctdb_context *ctdb,
 		tree_item = talloc(tree, struct ctdb_script_tree_item);
 		if (tree_item == NULL) {
 			DEBUG(DEBUG_ERR, (__location__ " Failed to allocate new tree item\n"));
+			closedir(dir);
 			talloc_free(tmp_ctx);
 			return NULL;
 		}
@@ -234,6 +235,7 @@ static struct ctdb_scripts_wire *ctdb_get_script_list(struct ctdb_context *ctdb,
 		tree_item->name = talloc_strdup(tree_item, de->d_name);
 		if (tree_item->name == NULL) {
 			DEBUG(DEBUG_ERR,(__location__ " Failed to allocate script name.\n"));
+			closedir(dir);
 			talloc_free(tmp_ctx);
 			return NULL;
 		}
@@ -777,10 +779,10 @@ int ctdb_event_script_args(struct ctdb_context *ctdb, enum ctdb_eventscript_call
 	va_start(ap, fmt);
 	ret = ctdb_event_script_callback_v(ctdb,
 			event_script_callback, &status, false, call, fmt, ap);
+	va_end(ap);
 	if (ret != 0) {
 		return ret;
 	}
-	va_end(ap);
 
 	status.status = -1;
 	status.done = false;
