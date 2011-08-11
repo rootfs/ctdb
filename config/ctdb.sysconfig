@@ -290,6 +290,15 @@ CTDB_DEBUGLEVEL=ERR
 # newly manage or no longer manage them?
 CTDB_SERVICE_AUTOSTARTSTOP=yes
 
+# Monitor filesystem useage.
+# when set, and the 40.fs_use eventscript is enabled, this variable
+# allows to monitor the filesystem use and flag a node as unhealthy when
+# the filesystem becomes too full.
+# This is useful for example when /var grows too big.
+# Example: monitor both / and /var and make the node unhealthy when eitehr go
+# above 90%
+# CTDB_CHECK_FS_USE="/:90 /var:90"
+
 # 
 #
 # set any default tuning options for ctdb
