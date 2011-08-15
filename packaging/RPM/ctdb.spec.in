@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.32
+Version: 1.2.33
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -145,6 +145,13 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Aug 15 2011 : Version 1.2.33
+ - Activate LCP2 by default
+ - LVS change to make the persistence timer longer
+ - Eventscripts: weaken the TCP checking if we have just started S1024874
+ - I/O queue buffer bug fix
+ - Remove log messages S1026357, S1026492
+ - 10.interface  dont check orphaned interfaces
 * Fri Jul 29 2011 : Version 1.2.32
  - Add new LCP2 ip allocation algorithm
  - Two fixes for 'ctdb delip ...' CQ S1026664 CQ S10226179
