@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.33
+Version: 1.2.34
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Fri Aug 26 2011 : Version 1.2.34
+ - Workaround for external startup issue for samba   S1028573
+ - Workaround for linux netstat bug   S1024874
 * Mon Aug 15 2011 : Version 1.2.33
  - Activate LCP2 by default
  - LVS change to make the persistence timer longer
