@@ -236,6 +236,9 @@ case "$1" in
 	;;
 
      monitor)
+	# create the state directory for samba
+	/bin/mkdir -p $CTDB_VARDIR/state/samba
+
 	# Create a dummy file to track when we need to do periodic cleanup
 	# of samba databases
 	[ -f $CTDB_VARDIR/state/samba/periodic_cleanup ] || {
