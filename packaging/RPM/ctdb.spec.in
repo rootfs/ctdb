@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.34
+Version: 1.2.35
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu Sep 8 2011 : Version 1.2.35
+ - Drop loglevel for a tevent warning from critical to error : S1028400
+ - Add new tunable : AllowClientDBAttach to allow different / new approach to concurrent upgrade
 * Fri Aug 26 2011 : Version 1.2.34
  - Workaround for external startup issue for samba   S1028573
  - Workaround for linux netstat bug   S1024874
