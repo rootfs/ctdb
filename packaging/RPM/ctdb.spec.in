@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.36
+Version: 1.2.37
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu Oct 13 2011 : Version 1.2.37
+ - updates to ctdb-diagnostics
 * Thu Sep 22 2011 : Version 1.2.36
  - Fix for delip failing to delete the ip drom the interface
    S1028798
