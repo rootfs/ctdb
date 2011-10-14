@@ -93,14 +93,14 @@ start_samba() {
 
 stop_samba() {
 	# shutdown Samba when ctdb goes down
-	[ "$CTDB_MANAGES_SAMBA" = "yes" ] && {
+	[ "$CTDB_AUTOSTOPPING" != "winbind" -a "$CTDB_MANAGES_SAMBA" = "yes" -o "$CTDB_AUTOSTOPPING" = "samba" ] && {
 		service "$CTDB_SERVICE_SMB" stop
 		service "$CTDB_SERVICE_NMB" stop
 	}
 
 	# stop the winbind service
 	check_ctdb_manages_winbind
-	[ "$CTDB_MANAGES_WINBIND" = "yes" ] && {
+	[ "$CTDB_AUTOSTOPPING" != "samba" -a "$CTDB_MANAGES_WINBIND" = "yes"  -o "$CTDB_AUTOSTOPPING" = "winbind" ] && {
 		service "$CTDB_SERVICE_WINBIND" stop
 	}
 

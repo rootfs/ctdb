@@ -857,6 +857,7 @@ ctdb_start_stop_service ()
     else
 	if [ -e "$_active" ] ; then
 	    echo "Stopping service $_service_name"
+	    CTDB_AUTOSTOPPING="$_service_name"
 	    ctdb_service_stop || exit $?
 	    rm -f "$_active"
 	    exit 0
