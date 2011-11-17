@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.38
+Version: 1.2.39
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu Nov 17 2011 : Version 1.2.39
+ - Handle canceled monitor events better, dont assume they are always status==OK
 * Mon Oct 17 2011 : Version 1.2.38
  - When adding a new ip, release it from the current node so it gets rebalanced : S1031575
  - fix autostop for 50.samba eventscript : S1031552
