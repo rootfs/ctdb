@@ -1851,6 +1851,7 @@ int ctdb_traverse(struct ctdb_db_context *ctdb_db, ctdb_traverse_func fn, void *
 	t.db_id = ctdb_db->db_id;
 	t.srvid = srvid;
 	t.reqid = 0;
+	t.withemptyrecords = false;
 
 	data.dptr = (uint8_t *)&t;
 	data.dsize = sizeof(t);
