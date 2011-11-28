@@ -1927,15 +1927,19 @@ int ctdb_dumpdb_record(struct ctdb_context *ctdb, TDB_DATA key, TDB_DATA data, v
 	if (h->flags & CTDB_REC_FLAG_AUTOMATIC) printf(" AUTOMATIC");
 	fprintf(f, "\n");
 
-	fprintf(f, "data(%u) = \"", (unsigned)(data.dsize - sizeof(*h)));
-	for (i=sizeof(*h);i<data.dsize;i++) {
-		if (ISASCII(data.dptr[i])) {
-			fprintf(f, "%c", data.dptr[i]);
-		} else {
-			fprintf(f, "\\%02X", data.dptr[i]);
+	if (c->printdatasize) {
+		fprintf(f, "data size: %u\n", (unsigned)data.dsize);
+	} else {
+		fprintf(f, "data(%u) = \"", (unsigned)(data.dsize - sizeof(*h)));
+		for (i=sizeof(*h);i<data.dsize;i++) {
+			if (ISASCII(data.dptr[i])) {
+				fprintf(f, "%c", data.dptr[i]);
+			} else {
+				fprintf(f, "\\%02X", data.dptr[i]);
+			}
 		}
+		fprintf(f, "\"\n");
 	}
-	fprintf(f, "\"\n");
 
 	fprintf(f, "\n");
 

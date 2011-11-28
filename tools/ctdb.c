@@ -44,6 +44,7 @@ static struct {
 	int verbose;
 	int maxruntime;
 	int printemptyrecords;
+	int printdatasize;
 } options;
 
 #define TIMELIMIT() timeval_current_ofs(options.timelimit, 0)
@@ -2720,6 +2721,7 @@ static int control_catdb(struct ctdb_context *ctdb, int argc, const char **argv)
 	ZERO_STRUCT(c);
 	c.f = stdout;
 	c.printemptyrecords = (bool)options.printemptyrecords;
+	c.printdatasize = (bool)options.printdatasize;
 
 	/* traverse and dump the cluster tdb */
 	ret = ctdb_dump_db(ctdb_db, &c);
@@ -3866,6 +3868,7 @@ static int control_dumpdbbackup(struct ctdb_context *ctdb, int argc, const char 
 	ZERO_STRUCT(c);
 	c.f = stdout;
 	c.printemptyrecords = (bool)options.printemptyrecords;
+	c.printdatasize = (bool)options.printdatasize;
 
 	for (i=0; i < m->count; i++) {
 		uint32_t reqid = 0;
@@ -4487,6 +4490,7 @@ int main(int argc, const char *argv[])
 		{ "verbose",    'v', POPT_ARG_NONE, &options.verbose, 0, "enable verbose output", NULL },
 		{ "maxruntime", 'T', POPT_ARG_INT, &options.maxruntime, 0, "die if runtime exceeds this limit (in seconds)", "integer" },
 		{ "print-emptyrecords", 0, POPT_ARG_NONE, &options.printemptyrecords, 0, "print the empty records when dumping databases (catdb, cattdb, dumpdbbackup)", NULL },
+		{ "print-datasize", 0, POPT_ARG_NONE, &options.printdatasize, 0, "do not print record data when dumping databases, only the data size", NULL },
 		POPT_TABLEEND
 	};
 	int opt;
