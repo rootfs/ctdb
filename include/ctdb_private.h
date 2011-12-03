@@ -655,7 +655,9 @@ enum ctdb_controls {CTDB_CONTROL_PROCESS_EXISTS          = 0,
 		    CTDB_CONTROL_SET_IFACE_LINK_STATE	 = 125,
 		    /* 126 & 127: skipped (master...) */
 		    CTDB_CONTROL_SCHEDULE_FOR_DELETION   = 128,
-};	
+		    /* 129 & 130: skipped (master) */
+		    CTDB_CONTROL_TRAVERSE_START_EXT	 = 131,
+};
 
 /*
   structure passed in set_call control
@@ -1117,6 +1119,12 @@ struct ctdb_traverse_start {
 	uint32_t db_id;
 	uint32_t reqid;
 	uint64_t srvid;
+};
+
+struct ctdb_traverse_start_ext {
+	uint32_t db_id;
+	uint32_t reqid;
+	uint64_t srvid;
 	bool withemptyrecords;
 };
 
@@ -1223,6 +1231,11 @@ struct ctdb_client_call_state {
 };
 
 
+int32_t ctdb_control_traverse_start_ext(struct ctdb_context *ctdb,
+					TDB_DATA indata,
+					TDB_DATA *outdata,
+					uint32_t srcnode,
+					uint32_t client_id);
 int32_t ctdb_control_traverse_start(struct ctdb_context *ctdb, TDB_DATA indata, 
 				    TDB_DATA *outdata, uint32_t srcnode, uint32_t client_id);
 int32_t ctdb_control_traverse_all(struct ctdb_context *ctdb, TDB_DATA data, TDB_DATA *outdata);
