@@ -202,10 +202,11 @@ store:
 		if (old.dptr) free(old.dptr);
 	}
 
-	DEBUG(DEBUG_DEBUG, (__location__ " db[%s]: %s record: hash[0x%08x]\n",
+	DEBUG(DEBUG_DEBUG, (__location__ " db[%s]: %s record: hash[0x%08x] "
+			    "jenkins hash[0x%08x]\n",
 			    ctdb_db->db_name,
 			    keep?"storing":"deleting",
-			    ctdb_hash(&key)));
+			    ctdb_hash(&key), (uint32_t)tdb_jenkins_hash(&key)));
 
 	if (keep) {
 		ret = tdb_store(ctdb_db->ltdb->tdb, key, rec, TDB_REPLACE);
