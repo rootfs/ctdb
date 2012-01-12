@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
-Version: 1.0.114.3
+Version: 1.0.114.4
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -127,6 +127,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Thu Jan 12 2012 : Version 1.0.114.4
+ - Rusty Russell: crash fix in takeover
+ - Rusty Russell: robustness fix regarding freeze vs vacuum
+ - David Disseldorp: Make queue_io_read() safe for reentry
+ - Gregor Beck: in ltdbtool, ignore empty (deleted) records per default
+ - Michael Adam: vacuuming code cleanup and improved logging
+ - Michael Adam and Stefan Metzmacher: add remove_from_delete_queue mechanism
+ - Michael Adam: improved of output format control for "ctdb catdb"
+ - ctdb catdb improvements
+ - documentation improvements and typo fixes
 * Wed Jul 13 2011 : Version 1.0.114.3
  - Stefan Metzmacher: make sure the recovery master has CTDB_CAP_RECMASTER
 * Fri May 20 2011 : Version 1.0.114.2
