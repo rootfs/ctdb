@@ -495,6 +495,9 @@ struct ctdb_context {
 
 	/* Used to defer db attach requests while in recovery mode */
 	struct ctdb_deferred_attach_context *deferred_attach;
+
+	/* list of event script callback functions that are active */
+	struct event_script_callback *script_callbacks;
 };
 
 struct ctdb_db_context {
