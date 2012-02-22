@@ -23,6 +23,7 @@
    License along with this library; if not, see <http://www.gnu.org/licenses/>.
 */
 #include "tdb_private.h"
+#define VALGRIND
 
 /* This is based on the hash algorithm from gdbm */
 unsigned int tdb_old_hash(TDB_DATA *key)
