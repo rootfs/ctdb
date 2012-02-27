@@ -1448,6 +1448,7 @@ bool lcp2_failback(struct ctdb_context *ctdb,
 		   struct ctdb_public_ip_list *all_ips,
 		   uint32_t *lcp2_imbalances,
 		   bool *newly_healthy);
+void lcp2_forcerebalance(struct ctdb_context *ctdb, uint32_t pnn);
 void ctdb_takeover_run_core(struct ctdb_context *ctdb,
 			    struct ctdb_node_map *nodemap,
 			    struct ctdb_public_ip_list **all_ips_p);
