@@ -499,6 +499,9 @@ struct ctdb_context {
 
 	/* list of event script callback functions that are active */
 	struct event_script_callback *script_callbacks;
+
+	/* if we are a child process, do we have a domain socket to send controls on */
+	bool can_send_controls;
 };
 
 struct ctdb_db_context {
