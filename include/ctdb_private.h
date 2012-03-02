@@ -533,6 +533,10 @@ struct ctdb_db_context {
 				  struct ctdb_ltdb_header *header,
 				  TDB_DATA data);
 
+	/* used to track which records we are currently fetching with readonly
+	   requests so we can avoid sending duplicates
+	*/
+	struct trbt_tree *deferred_ro_fetch;
 };
 
 
