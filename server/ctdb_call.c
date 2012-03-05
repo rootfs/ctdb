@@ -579,7 +579,8 @@ void ctdb_request_call(struct ctdb_context *ctdb, struct ctdb_req_header *hdr)
 	&&  (c->callid == CTDB_FETCH_WITH_HEADER_FUNC)
 	&&  (!(header.flags & CTDB_REC_RO_HAVE_DELEGATIONS))) {
 		header.rsn     += 3;
-		header.flags   |= CTDB_REC_RO_HAVE_DELEGATIONS;
+		header.flags   |= CTDB_REC_RO_HAVE_DELEGATIONS|CTDB_REC_FLAG_MIGRATED_WITH_DATA;
+
 		if (ctdb_ltdb_store(ctdb_db, call->key, &header, data) != 0) {
 			ctdb_fatal(ctdb, "Failed to store record with HAVE_DELEGATIONS set");
 		}
