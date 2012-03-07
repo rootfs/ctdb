@@ -339,7 +339,7 @@ static void ctdb_become_dmaster(struct ctdb_db_context *ctdb_db,
 		return;
 	}
 
-	ctdb_call_local(ctdb_db, state->call, &header, state, &data);
+	ctdb_call_local(ctdb_db, state->call, &header, state, &data, ctdb->pnn);
 
 	ret = ctdb_ltdb_unlock(ctdb_db, state->call->key);
 	if (ret != 0) {
@@ -520,11 +520,15 @@ void ctdb_request_call(struct ctdb_context *ctdb, struct ctdb_req_header *hdr)
 
 	CTDB_UPDATE_STAT(ctdb, max_hop_count, c->hopcount);
 
-	/* Try if possible to migrate the record off to the caller node.
-	 * From the clients perspective a fetch of the data is just as 
-	 * expensive as a migration.
-	 */
-	if (c->hdr.srcnode != ctdb->pnn) {
+	/* if this nodes has done enough consecutive calls on the same record
+	   then give them the record
+	   or if the node requested an immediate migration
+	*/
+	if ( c->hdr.srcnode != ctdb->pnn &&
+	     ((header.laccessor == c->hdr.srcnode
+	       && header.lacount >= ctdb->tunable.max_lacount
+	       && ctdb->tunable.max_lacount != 0)
+	      || (c->flags & CTDB_IMMEDIATE_MIGRATION)) ) {
 		if (ctdb_db->transaction_active) {
 			DEBUG(DEBUG_INFO, (__location__ " refusing migration"
 			      " of key %s while transaction is active\n",
@@ -543,7 +547,7 @@ void ctdb_request_call(struct ctdb_context *ctdb, struct ctdb_req_header *hdr)
 		}
 	}
 
-	ctdb_call_local(ctdb_db, call, &header, hdr, &data);
+	ctdb_call_local(ctdb_db, call, &header, hdr, &data, c->hdr.srcnode);
 
 	ret = ctdb_ltdb_unlock(ctdb_db, call->key);
 	if (ret != 0) {
@@ -766,7 +770,7 @@ struct ctdb_call_state *ctdb_call_local_send(struct ctdb_db_context *ctdb_db,
 	*(state->call) = *call;
 	state->ctdb_db = ctdb_db;
 
-	ret = ctdb_call_local(ctdb_db, state->call, header, state, data);
+	ret = ctdb_call_local(ctdb_db, state->call, header, state, data, ctdb->pnn);
 
 	event_add_timed(ctdb->ev, state, timeval_zero(), call_local_trigger, state);
 

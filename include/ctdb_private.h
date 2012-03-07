@@ -123,6 +123,7 @@ struct ctdb_tunable {
 	uint32_t lcp2_public_ip_assignment;
 	uint32_t allow_client_db_attach;
 	uint32_t fetch_lock_collapse;
+	uint32_t max_lacount;
 };
 
 /*
@@ -795,7 +796,7 @@ struct ctdb_call_state *ctdb_daemon_call_send_remote(struct ctdb_db_context *ctd
 
 int ctdb_call_local(struct ctdb_db_context *ctdb_db, struct ctdb_call *call,
 		    struct ctdb_ltdb_header *header, TALLOC_CTX *mem_ctx,
-		    TDB_DATA *data);
+		    TDB_DATA *data, uint32_t caller);
 
 #define ctdb_reqid_find(ctdb, reqid, type)	(type *)_ctdb_reqid_find(ctdb, reqid, #type, __location__)
 
