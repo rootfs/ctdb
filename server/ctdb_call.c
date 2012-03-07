@@ -466,6 +466,7 @@ void ctdb_request_call(struct ctdb_context *ctdb, struct ctdb_req_header *hdr)
 	struct ctdb_ltdb_header header;
 	struct ctdb_call *call;
 	struct ctdb_db_context *ctdb_db;
+	int tmp_count, bucket;
 
 	if (ctdb->methods == NULL) {
 		DEBUG(DEBUG_INFO,(__location__ " Failed ctdb_request_call. Transport is DOWN\n"));
@@ -519,6 +520,17 @@ void ctdb_request_call(struct ctdb_context *ctdb, struct ctdb_req_header *hdr)
 	}
 
 	CTDB_UPDATE_STAT(ctdb, max_hop_count, c->hopcount);
+	tmp_count = c->hopcount;
+	bucket = 0;
+	while (tmp_count) {
+		tmp_count >>= 2;
+		bucket++;
+	}
+	if (bucket >= MAX_HOP_COUNT_BUCKETS) {
+		bucket = MAX_HOP_COUNT_BUCKETS - 1;
+	}
+	CTDB_INCREMENT_STAT(ctdb, hop_count_bucket[bucket]);
+
 
 	/* if this nodes has done enough consecutive calls on the same record
 	   then give them the record
