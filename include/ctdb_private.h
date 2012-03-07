@@ -122,6 +122,7 @@ struct ctdb_tunable {
 	uint32_t vacuum_fast_path_count;
 	uint32_t lcp2_public_ip_assignment;
 	uint32_t allow_client_db_attach;
+	uint32_t fetch_lock_collapse;
 };
 
 /*
@@ -523,6 +524,10 @@ struct ctdb_db_context {
 				  struct ctdb_ltdb_header *header,
 				  TDB_DATA data);
 
+	/* used to track which records we are currently fetching
+	   so we can avoid sending duplicate fetch requests
+	*/
+	struct trbt_tree *deferred_fetch;
 };
 
 
