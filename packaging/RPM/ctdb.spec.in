@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.41
+Version: 1.2.42
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,10 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Mon Mar 12 2012 : Version 1.2.42
+ - Allow non-readonly database UPDATE_RECORD to create non-existing records
+   or else net command and the registry breaks.
+   S1035666
 * Tue Mar 6 2012 : Version 1.2.41
  - rewrite of 13.per_ip_routing script
  - readonly record bugfixes
