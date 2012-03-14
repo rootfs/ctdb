@@ -71,7 +71,7 @@ static const struct {
 	{ "DeferredAttachTO",  120,  offsetof(struct ctdb_tunable, deferred_attach_timeout) },
 	{ "AllowClientDBAttach", 1, offsetof(struct ctdb_tunable, allow_client_db_attach) },
 	{ "FetchLockCollapse", 1, offsetof(struct ctdb_tunable, fetch_lock_collapse) },
-	{ "MaxLACount",           20,  offsetof(struct ctdb_tunable, max_lacount) },
+	{ "MaxLACount",           0,  offsetof(struct ctdb_tunable, max_lacount) },
 };
 
 /*
