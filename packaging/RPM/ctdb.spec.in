@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.39
-Release: 29GITHASH
+Release: 30GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -144,6 +144,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu Mar 15 2012 : Version 1.2.39-30
+ - revert fetchlock collapse, CHECK_SRVIDS, lacount migration
 * Thu Nov 17 2011 : Version 1.2.39
  - Handle canceled monitor events better, dont assume they are always status==OK
 * Mon Oct 17 2011 : Version 1.2.38
