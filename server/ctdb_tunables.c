@@ -70,8 +70,7 @@ static const struct {
 	{ "StatHistoryInterval",  1,  offsetof(struct ctdb_tunable, stat_history_interval) },
 	{ "DeferredAttachTO",  120,  offsetof(struct ctdb_tunable, deferred_attach_timeout) },
 	{ "AllowClientDBAttach", 1, offsetof(struct ctdb_tunable, allow_client_db_attach) },
-	{ "FetchLockCollapse", 1, offsetof(struct ctdb_tunable, fetch_lock_collapse) },
-	{ "MaxLACount",           0,  offsetof(struct ctdb_tunable, max_lacount) },
+	{ "FetchLockCollapse", 1, offsetof(struct ctdb_tunable, fetch_lock_collapse) }
 };
 
 /*
