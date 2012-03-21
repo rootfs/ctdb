@@ -146,6 +146,11 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Wed Mar 21 2012 : Version 1.13.1
+ - Add hop count buffers for better statistics collection
+ - Add primitive/basic STICKY records support
+ - Add LACount based migration
+ - Improve fetch collapse to cover all fetch types
 * Thu Mar 1 2012 : Version 1.13
  - This is the new stable branch for modern features for ctdb.
    Main new features are performance/scaling improvements for
