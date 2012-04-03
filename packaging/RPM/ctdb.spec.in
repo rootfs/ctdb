@@ -145,6 +145,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Tue Apr 3 2012 : Version 1.41
+ - add back the rebalanceip command
 * Thu Mar 1 2012 : Version 1.13
  - This is the new stable branch for modern features for ctdb.
    Main new features are performance/scaling improvements for
