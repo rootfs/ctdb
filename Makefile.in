@@ -29,6 +29,18 @@ POPT_LIBS = @POPT_LIBS@
 POPT_CFLAGS = @POPT_CFLAGS@
 POPT_OBJ = @POPT_OBJ@
 
+TALLOC_LIBS = @TALLOC_LIBS@
+TALLOC_CFLAGS = @TALLOC_CFLAGS@
+TALLOC_OBJ = @TALLOC_OBJ@
+
+TEVENT_LIBS = @TEVENT_LIBS@
+TEVENT_CFLAGS = @TEVENT_CFLAGS@
+TEVENT_OBJ = @TEVENT_OBJ@
+
+TDB_LIBS = @TDB_LIBS@
+TDB_CFLAGS = @TDB_CFLAGS@
+TDB_OBJ = @TDB_OBJ@
+
 SOCKET_WRAPPER_OBJ = @SOCKET_WRAPPER_OBJS@
 
 PMDA_LIBS = -lpcp -lpcp_pmda
@@ -36,7 +48,7 @@ PMDA_INSTALL = @CTDB_PMDA_INSTALL@
 PMDA_DEST_DIR = /var/lib/pcp/pmdas
 
 CFLAGS=@CPPFLAGS@ -g -I$(srcdir)/include -Iinclude -Ilib -Ilib/util -I$(srcdir) \
-       -I@tallocdir@ -I@tdbdir@/include -I@libreplacedir@ \
+       $(TALLOC_CFLAGS) $(TEVENT_CFLAGS) $(TDB_CFLAGS) -I@libreplacedir@ \
 	-DVARDIR=\"$(localstatedir)\" -DETCDIR=\"$(etcdir)\" \
 	-DLOGDIR=\"$(logdir)\" \
 	-DUSE_MMAP=1 -DTEVENT_DEPRECATED_QUIET=1 @CFLAGS@ -Wno-format-zero-length $(POPT_CFLAGS) \
@@ -46,7 +58,8 @@ LDSHFLAGS=-fPIC -shared
 #LDSHFLAGS=-fPIC -shared -Wl,-Bsymbolic -Wl,-z,relo -Wl,-Bsymbolic-funtions -Wl,--as-needed -Wl,-z,defs
 SHLD=${CC} ${CFLAGS} ${LDSHFLAGS} -o $@
 
-LIB_FLAGS=@LDFLAGS@ -Llib @LIBS@ $(POPT_LIBS) @INFINIBAND_LIBS@ @CTDB_PCAP_LDFLAGS@
+LIB_FLAGS=@LDFLAGS@ -Llib @LIBS@ $(POPT_LIBS) $(TALLOC_LIBS) $(TEVENT_LIBS) $(TDB_LIBS) \
+		  @INFINIBAND_LIBS@ @CTDB_PCAP_LDFLAGS@
 
 UTIL_OBJ = lib/util/idtree.o lib/util/db_wrap.o lib/util/strlist.o lib/util/util.o \
 	lib/util/util_time.o lib/util/util_file.o lib/util/fault.o lib/util/substitute.o \
@@ -64,8 +77,8 @@ CTDB_LIB_OBJ = libctdb/ctdb.o libctdb/io_elem.o libctdb/local_tdb.o \
 CTDB_TCP_OBJ = tcp/tcp_connect.o tcp/tcp_io.o tcp/tcp_init.o
 
 CTDB_CLIENT_OBJ = client/ctdb_client.o \
-	$(CTDB_COMMON_OBJ) $(POPT_OBJ) $(UTIL_OBJ) @TALLOC_OBJ@ @TDB_OBJ@ \
-	@LIBREPLACEOBJ@ $(EXTRA_OBJ) @TEVENT_OBJ@ $(SOCKET_WRAPPER_OBJ)
+	$(CTDB_COMMON_OBJ) $(POPT_OBJ) $(UTIL_OBJ) $(TALLOC_OBJ) $(TDB_OBJ) \
+	@LIBREPLACEOBJ@ $(EXTRA_OBJ) $(TEVENT_OBJ) $(SOCKET_WRAPPER_OBJ)
 
 CTDB_SERVER_OBJ = server/ctdbd.o server/ctdb_daemon.o server/ctdb_lockwait.o \
 	server/ctdb_recoverd.o server/ctdb_recover.o server/ctdb_freeze.o \
@@ -102,7 +115,7 @@ all: showflags dirs doc $(CTDB_SERVER_OBJ) $(CTDB_CLIENT_OBJ) $(CTDB_LIB_OBJ) $(
 showflags:
 	@echo 'ctdb will be compiled with flags:'
 	@echo '  CFLAGS = $(CFLAGS)'
-	@echo '  LIBS = $(LIBS)'
+	@echo '  LIBS = $(LIB_FLAGS)'
 
 showlayout::
 	@echo "ctdb will be installed into:"
@@ -150,9 +163,9 @@ bin/ctdb: $(CTDB_CLIENT_OBJ) tools/ctdb.o tools/ctdb_vacuum.o libctdb/libctdb.a
 	@echo Linking $@
 	@$(CC) $(CFLAGS) -o $@ tools/ctdb.o tools/ctdb_vacuum.o $(CTDB_CLIENT_OBJ) $(LIB_FLAGS) libctdb/libctdb.a
 
-bin/ltdbtool: tools/ltdbtool.o @TDB_OBJ@
+bin/ltdbtool: tools/ltdbtool.o $(TDB_OBJ)
 	@echo Linking $@
-	@$(CC) $(CFLAGS) -o $@ $+
+	@$(CC) $(CFLAGS) -o $@ $+ $(TDB_LIBS)
 
 bin/smnotify: utils/smnotify/gen_xdr.o utils/smnotify/gen_smnotify.o utils/smnotify/smnotify.o $(POPT_OBJ)
 	@echo Linking $@
@@ -198,11 +211,11 @@ tests/bin/ctdb_fetch_one: $(CTDB_CLIENT_OBJ) tests/src/ctdb_fetch_one.o
 
 tests/bin/ctdb_fetch_lock_once: libctdb/libctdb.a tests/src/ctdb_fetch_lock_once.o 
 	@echo Linking $@
-	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_fetch_lock_once.o @TDB_OBJ@ @POPT_OBJ@ libctdb/libctdb.a $(LIB_FLAGS)
+	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_fetch_lock_once.o $(TDB_OBJ) $(POPT_OBJ) libctdb/libctdb.a $(LIB_FLAGS)
 
 tests/bin/ctdb_fetch_readonly_once: libctdb/libctdb.a tests/src/ctdb_fetch_readonly_once.o
 	@echo Linking $@
-	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_fetch_readonly_once.o @TDB_OBJ@ @POPT_OBJ@ libctdb/libctdb.a $(LIB_FLAGS)
+	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_fetch_readonly_once.o $(TDB_OBJ) $(POPT_OBJ) libctdb/libctdb.a $(LIB_FLAGS)
 
 tests/bin/ctdb_fetch_readonly_loop: $(CTDB_CLIENT_OBJ) tests/src/ctdb_fetch_readonly_loop.o
 	@echo Linking $@
@@ -245,8 +258,8 @@ CTDBD_TEST_C = $(CTDB_SERVER_MOST_OBJ:.o=.c) tests/src/ctdbd_test.c
 
 CTDB_TEST_C = $(CTDB_CLIENT_OBJ:.o=.c) tools/ctdb.c tools/ctdb_vacuum.c  tests/src/ctdb_test.c
 
-CTDB_TEST_OBJ =  @TALLOC_OBJ@ @TDB_OBJ@ \
-	@CTDB_SYSTEM_OBJ@ @LIBREPLACEOBJ@ $(EXTRA_OBJ) @TEVENT_OBJ@ $(SOCKET_WRAPPER_OBJ)
+CTDB_TEST_OBJ =  $(TALLOC_OBJ) $(TDB_OBJ) \
+	@CTDB_SYSTEM_OBJ@ @LIBREPLACEOBJ@ $(EXTRA_OBJ) $(TEVENT_OBJ) $(SOCKET_WRAPPER_OBJ)
 
 tests/src/ctdb_takeover_tests.o: tests/src/ctdb_takeover_tests.c $(CTDBD_TEST_C)
 
@@ -258,13 +271,13 @@ tests/src/ctdb_tool_libctdb.o: tests/src/ctdb_tool_libctdb.c tests/src/libctdb_t
 
 tests/bin/ctdb_tool_libctdb: $(CTDB_TEST_OBJ) tests/src/ctdb_tool_libctdb.o
 	@echo Linking $@
-	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_tool_libctdb.o $(CTDB_TEST_OBJ) @POPT_OBJ@ $(LIB_FLAGS)
+	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_tool_libctdb.o $(CTDB_TEST_OBJ) $(POPT_OBJ) $(LIB_FLAGS)
 
 tests/src/ctdb_tool_stubby.o: tests/src/ctdb_tool_stubby.c tests/src/libctdb_test.c $(CTDB_TEST_C)
 
 tests/bin/ctdb_tool_stubby: $(CTDB_TEST_OBJ) tests/src/ctdb_tool_stubby.o
 	@echo Linking $@
-	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_tool_stubby.o $(CTDB_TEST_OBJ) @POPT_OBJ@ $(LIB_FLAGS)
+	@$(CC) $(CFLAGS) -o $@ tests/src/ctdb_tool_stubby.o $(CTDB_TEST_OBJ) $(POPT_OBJ) $(LIB_FLAGS)
 
 tests/bin/ibwrapper_test: $(CTDB_CLIENT_OBJ) ib/ibwrapper_test.o
 	@echo Linking $@
@@ -357,6 +370,11 @@ test: all
 valgrindtest: all
 	VALGRIND="valgrind -q --trace-children=yes" tests/run_tests.sh
 
+ctags:
+	find . -name "*.[ch]" | xargs ctags
+
+etags:
+	find . -name "*.[ch]" | xargs etags
 
 realdistclean: distclean
 	rm -f configure config.h.in ctdb.pc
