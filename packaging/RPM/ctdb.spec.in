@@ -145,6 +145,11 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu May 3 2012 : Version 1.42
+ - Add a new command 'reloadips' that can be used to re-read and update from
+   the public addresses file at runtime.
+ - Sync up with upstream tdb/talloc/tevent
+ - new tests
 * Tue Apr 3 2012 : Version 1.41
  - add back the rebalanceip command
 * Thu Mar 1 2012 : Version 1.13
