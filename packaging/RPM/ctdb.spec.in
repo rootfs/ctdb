@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
-Version: 1.0.114.4
+Version: 1.0.114.5
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -127,6 +127,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Mon May 07 2012 : Version 1.0.114.5
+ - Rusty Russell: wrap iptables in flock to avoid concurrancy
+   (backported from master)
+ - Michael Adam: let recovery finish a transaction_commit
+   (backported from master)
+ - Michael Adam: let error in transaction_commit trigger a recovery
+   (backported from master)
 * Thu Jan 12 2012 : Version 1.0.114.4
  - Rusty Russell: crash fix in takeover
  - Rusty Russell: robustness fix regarding freeze vs vacuum
