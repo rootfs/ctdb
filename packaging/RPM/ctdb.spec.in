@@ -12,17 +12,41 @@ URL: http://ctdb.samba.org/
 
 Source: ctdb-%{version}.tar.gz
 
-Prereq: /bin/mktemp /usr/bin/killall
-Prereq: fileutils sed /etc/init.d
+# Packages
+Requires: coreutils, sed, gawk, iptables, iproute, procps, ethtool
+# Commands - package name might vary
+Requires: /usr/bin/killall, /bin/kill, /bin/netstat
+# Directories
+Requires: /etc/init.d
 
 Provides: ctdb = %{version}
 
 Prefix: /usr
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
 
+# Always use the bundled versions of these libraries.
+%define with_included_talloc 1
+%define with_included_tdb 1
+%define with_included_tevent 1
+
+# If the above options are changed then mandate minimum system
+# versions.
+%define libtalloc_version 2.0.6
+%define libtdb_version 1.2.9
+%define libtevent_version 0.9.13
+
+%if ! %with_included_talloc
+BuildRequires: libtalloc-devel >= %{libtalloc_version}
+%endif
+%if ! %with_included_tdb
+BuildRequires: libtdb-devel >= %{libtdb_version}
+%endif
+%if ! %with_included_tevent
+BuildRequires: libtevent-devel >= %{libtevent_version}
+%endif
+
 %description
 ctdb is the clustered database used by samba
-
 
 #######################################################################
 
@@ -48,6 +72,15 @@ export CC
 ./autogen.sh
 
 CFLAGS="$RPM_OPT_FLAGS $EXTRA -O0 -D_GNU_SOURCE -DCTDB_VERS=\"%{version}-%{release}\"" ./configure \
+%if %with_included_talloc
+	--with-included-talloc \
+%endif
+%if %with_included_tdb
+	--with-included-tdb \
+%endif
+%if %with_included_tevent
+	--with-included-tevent \
+%endif
 	--prefix=%{_prefix} \
 	--sysconfdir=%{_sysconfdir} \
 	--mandir=%{_mandir} \
@@ -64,7 +97,7 @@ rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/init.d
 
-make DESTDIR=$RPM_BUILD_ROOT docdir=%{_docdir} install
+make DESTDIR=$RPM_BUILD_ROOT docdir=%{_docdir} install install_tests
 
 install -m644 config/ctdb.sysconfig $RPM_BUILD_ROOT%{_sysconfdir}/sysconfig/ctdb
 install -m755 config/ctdb.init $RPM_BUILD_ROOT%{initdir}/ctdb
@@ -129,8 +162,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %package devel
-Summary: CTDB developmnet libraries
-Group: Development
+Summary: CTDB development libraries
+Group: Development/Libraries
 
 %description devel
 development libraries for ctdb
@@ -143,6 +176,25 @@ development libraries for ctdb
 %{_includedir}/ctdb_private.h
 %{_includedir}/ctdb_typesafe_cb.h
 %{_libdir}/libctdb.a
+
+%package tests
+Summary: CTDB test suite
+Group: Development/Tools
+Requires: ctdb = %{version}
+
+%description tests
+test suite for ctdb
+
+%files tests
+%defattr(-,root,root)
+%dir %{_datadir}/%{name}-tests
+%{_datadir}/%{name}-tests/*
+%dir %{_libdir}/%{name}-tests
+%{_libdir}/%{name}-tests/*
+%{_bindir}/ctdb_run_tests
+%{_bindir}/ctdb_run_cluster_tests
+%doc tests/README
+
 
 %changelog
 * Thu May 3 2012 : Version 1.42

@@ -1,6 +1,5 @@
-This contains a Python simulation of CTDB's IP reallocation algorithm.
+Unit tests for the CTDB IP allocation algorithm(s).
 
-It is useful for experimenting with improvements.
-
-To use this on RHEL5 you'll need python2.6 from EPEL
-<http://fedoraproject.org/wiki/EPEL>.
+Test case filenames look like <algorithm>.NNN.sh, where <algorithm>
+indicates the IP allocation algorithm to use.  These use the
+ctdb_takeover_test test program.

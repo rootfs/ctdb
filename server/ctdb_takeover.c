@@ -349,11 +349,15 @@ static void ctdb_do_takeip_callback(struct ctdb_context *ctdb, int status,
 		return;
 	}
 
+	if (ctdb->do_checkpublicip) {
+
 	ret = ctdb_announce_vnn_iface(ctdb, state->vnn);
 	if (ret != 0) {
 		ctdb_request_control_reply(ctdb, state->c, NULL, -1, NULL);
 		talloc_free(state);
 		return;
+	}
+
 	}
 
 	data.dptr  = (uint8_t *)ctdb_addr_to_str(&state->vnn->public_address);
@@ -382,7 +386,7 @@ static int32_t ctdb_do_takeip(struct ctdb_context *ctdb,
 	ret = ctdb_vnn_assign_iface(ctdb, vnn);
 	if (ret != 0) {
 		DEBUG(DEBUG_ERR,("Takeover of IP %s/%u failed to "
-				 "assin a usable interface\n",
+				 "assign a usable interface\n",
 				 ctdb_addr_to_str(&vnn->public_address),
 				 vnn->public_netmask_bits));
 		return -1;
@@ -459,11 +463,15 @@ static void ctdb_do_updateip_callback(struct ctdb_context *ctdb, int status,
 		return;
 	}
 
+	if (ctdb->do_checkpublicip) {
+
 	ret = ctdb_announce_vnn_iface(ctdb, state->vnn);
 	if (ret != 0) {
 		ctdb_request_control_reply(ctdb, state->c, NULL, -1, NULL);
 		talloc_free(state);
 		return;
+	}
+
 	}
 
 	/* the control succeeded */
@@ -590,7 +598,9 @@ int32_t ctdb_control_takeover_ip(struct ctdb_context *ctdb,
 		return 0;
 	}
 
-	have_ip = ctdb_sys_have_ip(&pip->addr);
+	if (ctdb->do_checkpublicip) {
+		have_ip = ctdb_sys_have_ip(&pip->addr);
+	}
 	best_iface = ctdb_vnn_best_iface(ctdb, vnn);
 	if (best_iface == NULL) {
 		DEBUG(DEBUG_ERR,("takeoverip of IP %s/%u failed to find"
@@ -606,6 +616,7 @@ int32_t ctdb_control_takeover_ip(struct ctdb_context *ctdb,
 		DEBUG(DEBUG_ERR,("Taking over newly created ip\n"));
 		have_ip = false;
 	}
+
 
 	if (vnn->iface == NULL && have_ip) {
 		DEBUG(DEBUG_CRIT,(__location__ " takeoverip of IP %s is known to the kernel, "
@@ -797,19 +808,27 @@ int32_t ctdb_control_release_ip(struct ctdb_context *ctdb,
 	talloc_free(vnn->takeover_ctx);
 	vnn->takeover_ctx = NULL;
 
-	if (!ctdb_sys_have_ip(&pip->addr)) {
-		DEBUG(DEBUG_DEBUG,("Redundant release of IP %s/%u on interface %s (ip not held)\n", 
-			ctdb_addr_to_str(&pip->addr),
-			vnn->public_netmask_bits, 
-			ctdb_vnn_iface_string(vnn)));
-		ctdb_vnn_unassign_iface(ctdb, vnn);
-		return 0;
-	}
+	if (ctdb->do_checkpublicip) {
 
-	if (vnn->iface == NULL) {
-		DEBUG(DEBUG_ERR,(__location__ " release_ip of IP %s is known to the kernel, "
-				 "but we have no interface assigned, has someone manually configured it? Ignore for now.\n",
-				 ctdb_addr_to_str(&vnn->public_address)));
+		if (!ctdb_sys_have_ip(&pip->addr)) {
+			DEBUG(DEBUG_DEBUG,("Redundant release of IP %s/%u on interface %s (ip not held)\n",
+				ctdb_addr_to_str(&pip->addr),
+				vnn->public_netmask_bits,
+				ctdb_vnn_iface_string(vnn)));
+			ctdb_vnn_unassign_iface(ctdb, vnn);
+			return 0;
+		}
+
+		if (vnn->iface == NULL) {
+			DEBUG(DEBUG_ERR,(__location__ " release_ip of IP %s is known to the kernel, "
+					 "but we have no interface assigned, has someone manually configured it? Ignore for now.\n",
+					 ctdb_addr_to_str(&vnn->public_address)));
+			return 0;
+		}
+
+	} else if (vnn->iface == NULL) {
+		DEBUG(DEBUG_ERR, ("No interface found for IP %s.\n",
+				     ctdb_addr_to_str(&vnn->public_address)));
 		return 0;
 	}
 
