@@ -111,6 +111,11 @@ build_ctdb_options () {
     maybe_set "--max-persistent-check-errors" "$CTDB_MAX_PERSISTENT_CHECK_ERRORS"
 }
 
+export_debug_variables ()
+{
+    export CTDB_DEBUG_HUNG_SCRIPT
+}
+
 check_tdb () {
 	local PDBASE=$1
 
@@ -238,6 +243,8 @@ start() {
     }
 
     build_ctdb_options
+
+    export_debug_variables
 
     # make sure we drop any ips that might still be held if previous
     # instance of ctdb got killed with -9 or similar
