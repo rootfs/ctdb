@@ -198,6 +198,10 @@ test suite for ctdb
 
 
 %changelog
+* Thu May 17 2012 : Version 1.32
+ - Update Ganesha script
+ - Add new script to collect data when eventscripts hang
+ - Tests updates
 * Thu May 3 2012 : Version 1.42
  - Add a new command 'reloadips' that can be used to re-read and update from
    the public addresses file at runtime.
