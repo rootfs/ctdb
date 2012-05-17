@@ -504,15 +504,14 @@ static void ctdb_event_script_handler(struct event_context *ev, struct fd_event 
 	}
 }
 
-static void debug_timeout(struct ctdb_event_script_state *state)
+static void ctdb_run_debug_hung_script(struct ctdb_context *ctdb, struct ctdb_event_script_state *state)
 {
 	struct ctdb_script_wire *current = get_current_script(state);
 	char *cmd;
 	pid_t pid;
-	time_t t;
-	char tbuf[100], buf[200];
+	const char * debug_hung_script = ETCDIR "/ctdb/debug-hung-script.sh";
 
-	cmd = child_command_string(state->ctdb, state,
+	cmd = child_command_string(ctdb, state,
 				   state->from_user, current->name,
 				   state->call, state->options);
 	CTDB_NO_MEMORY_VOID(state->ctdb, cmd);
@@ -521,26 +520,36 @@ static void debug_timeout(struct ctdb_event_script_state *state)
 			 cmd, timeval_elapsed(&current->start), state->child));
 	talloc_free(cmd);
 
-	t = time(NULL);
-	strftime(tbuf, sizeof(tbuf)-1, "%Y%m%d%H%M%S", 	localtime(&t));
-	sprintf(buf, "{ pstree -p; cat /proc/locks; ls -li /var/ctdb/ /var/ctdb/persistent; }"
-			" >/tmp/ctdb.event.%s.%d", tbuf, getpid());
-
-	pid = ctdb_fork(state->ctdb);
-	if (pid == 0) {
-		system(buf);
-		/* Now we can kill the child */
+	if (!ctdb_fork_with_logging(ctdb, ctdb, NULL, NULL, &pid)) {
+		DEBUG(DEBUG_ERR,("Failed to fork a child process with logging to track hung event script\n"));
 		kill(state->child, SIGTERM);
-		exit(0);
+		return;
 	}
 	if (pid == -1) {
 		DEBUG(DEBUG_ERR,("Fork for debug script failed : %s\n",
 				 strerror(errno)));
-	} else {
-		DEBUG(DEBUG_ERR,("Logged timedout eventscript : %s\n", buf));
-		/* Don't kill child until timeout done. */
-		state->child = 0;
+		kill(state->child, SIGTERM);
+		return;
 	}
+	if (pid == 0) {
+		char *buf;
+
+		if (getenv("CTDB_DEBUG_HUNG_SCRIPT") != NULL) {
+			debug_hung_script = getenv("CTDB_DEBUG_HUNG_SCRIPT");
+		}
+
+		buf = talloc_asprintf(NULL, "%s %d",
+				      debug_hung_script, state->child);
+		system(buf);
+		talloc_free(buf);
+
+		/* Now we can kill the child */
+		kill(state->child, SIGTERM);
+		_exit(0);
+	}
+
+	/* Don't kill child until timeout done. */
+	state->child = 0;
 }
 
 /* called when child times out */
@@ -564,10 +573,11 @@ static void ctdb_event_script_timeout(struct event_context *ev, struct timed_eve
 	case CTDB_EVENT_STATUS:
 		state->scripts->scripts[state->current].status = 0;
 		DEBUG(DEBUG_ERR,("Ignoring hung script for %s call %d\n", state->options, state->call));
+		ctdb_run_debug_hung_script(ctdb, state);
 		break;
         default:
 		state->scripts->scripts[state->current].status = -ETIME;
-		debug_timeout(state);
+		ctdb_run_debug_hung_script(ctdb, state);
 	}
 
 	talloc_free(state);
