@@ -73,6 +73,7 @@ static const struct {
 	{ "DeferredRebalanceOnNodeAdd", 300, offsetof(struct ctdb_tunable, deferred_rebalance_on_node_add) },
 	{ "RecoverPDBBySeqNum",  1, offsetof(struct ctdb_tunable, recover_pdb_by_seqnum) },
 	{ "FetchCollapse",       1, offsetof(struct ctdb_tunable, fetch_collapse) },
+	{ "PullDBPreallocation", 10*1024*1024,  offsetof(struct ctdb_tunable, pulldb_preallocation_size), false },
 };
 
 /*
