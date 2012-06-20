@@ -1812,6 +1812,27 @@ static int control_addip(struct ctdb_context *ctdb, int argc, const char **argv)
 	return 0;
 }
 
+/*
+  add a public ip address to a node
+ */
+static int control_ipiface(struct ctdb_context *ctdb, int argc, const char **argv)
+{
+	ctdb_sock_addr addr;
+
+	if (argc != 1) {
+		usage();
+	}
+
+	if (!parse_ip(argv[0], NULL, 0, &addr)) {
+		printf("Badly formed ip : %s\n", argv[0]);
+		return -1;
+	}
+
+	printf("IP on interface %s\n", ctdb_sys_find_ifname(&addr));
+
+	return 0;
+}
+
 static int control_delip(struct ctdb_context *ctdb, int argc, const char **argv);
 
 static int control_delip_all(struct ctdb_context *ctdb, int argc, const char **argv, ctdb_sock_addr *addr)
@@ -5178,6 +5199,7 @@ static const struct {
 	{ "writekey", 	     control_writekey,      	true,	false,  "write to a database key", "<tdb-file> <key> <value>" },
 	{ "checktcpport",    control_chktcpport,      	false,	true,  "check if a service is bound to a specific tcp port or not", "<port>" },
 	{ "rebalancenode",     control_rebalancenode,	false,	false, "release a node by allowing it to takeover ips", "<pnn>"},
+	{ "ipiface",         control_ipiface,           true,	true,  "Find which interface an ip address is hsoted on", "<ip>" },
 };
 
 /*
