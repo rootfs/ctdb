@@ -199,6 +199,12 @@ test suite for ctdb
 
 
 %changelog
+* Wed Jun 20 2012 : Version 1.44
+ - Add back tracking of long running events
+ - Add checks and logigng when a database contains a very large number of records or very large records
+ - When performing database recovery, preallocate the marshalling buffer in large chunks instead of calling a sometimes very expensive reallo()
+ - test updates
+ - add new function to automatically find which interface an ip address is hosted on
 * Thu May 17 2012 : Version 1.32
  - Update Ganesha script
  - Add new script to collect data when eventscripts hang
