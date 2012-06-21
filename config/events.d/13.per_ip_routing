@@ -156,7 +156,7 @@ clean_up_table_ids ()
 	awk -v min="$CTDB_PER_IP_ROUTING_TABLE_ID_LOW" \
 	    -v max="$CTDB_PER_IP_ROUTING_TABLE_ID_HIGH" \
 	    -v pre="$table_id_prefix" \
-	    'index($0, "#") == 1 || \
+	    '/^#/ || \
 	     !(min <= $1 && $1 <= max) && \
 	     !(index($2, pre) == 1) \
 	     { print $0 }' "$_f" >"$_tmp"
