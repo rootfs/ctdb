@@ -105,7 +105,9 @@ ensure_table_id_for_ip ()
     # new unused one (that is greater than all the used ones in the
     # range).
     (
-	flock 0
+	# Note that die() just gets us out of the subshell...
+	flock --timeout 30 0 || \
+	    die "ensure_table_id_for_ip: failed to lock file $_f"
 
 	_new=$CTDB_PER_IP_ROUTING_TABLE_ID_LOW
 	while read _t _l ; do
@@ -148,7 +150,9 @@ clean_up_table_ids ()
     fi
 
     (
-	flock 0
+	# Note that die() just gets us out of the subshell...
+	flock --timeout 30 0 || \
+	    die "clean_up_table_ids: failed to lock file $_f"
 
 	# Delete any items from the file that have a table id in our
 	# range or a label matching our label.  Preserve comments.
