@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.44
+Version: 1.2.45
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Thu Jul 12 2012 : Version 1.2.45
+ - Robust removal of rogue public IPs
 * Fri Jun 29 2012 : Version 1.2.44
  - improvements to the policy routing support
 * Thu Mar 29 2012 : Version 1.2.43
