@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.45
+Version: 1.2.46
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Tue Jul 24 2012 : Version 1.2.46
+ - Default route on NAT gateway should have a metric of 10
 * Thu Jul 12 2012 : Version 1.2.45
  - Robust removal of rogue public IPs
 * Fri Jun 29 2012 : Version 1.2.44
