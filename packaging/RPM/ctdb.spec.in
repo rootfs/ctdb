@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.48
+Version: 1.2.49
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -144,6 +144,10 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+
+* Tue Aug 21 2012 : Version 1.2.49
+ - logging: Close unix socket /tmp/ctdb.socket in syslogd process
+ - Initscript: Kill any existing ctdbd processes if the ping succeeds
 * Thu Aug 08 2012 : Version 1.2.48
  - Fix missing set_proc() in policy routing
 * Thu Aug 08 2012 : Version 1.2.47
