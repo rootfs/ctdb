@@ -291,6 +291,7 @@ install: all
 	if [ -f doc/ltdbtool.1 ]; then ${INSTALLCMD} -m 644 doc/ltdbtool.1 $(DESTDIR)$(mandir)/man1; fi
 	if [ ! -f $(DESTDIR)$(etcdir)/ctdb/notify.sh ];then ${INSTALLCMD} -m 755 config/notify.sh $(DESTDIR)$(etcdir)/ctdb; fi
 	if [ ! -f $(DESTDIR)$(etcdir)/ctdb/ctdb-crash-cleanup.sh ];then ${INSTALLCMD} -m 755 config/ctdb-crash-cleanup.sh $(DESTDIR)$(etcdir)/ctdb; fi
+	if [ ! -f $(DESTDIR)$(etcdir)/ctdb/gcore_trace.sh ];then ${INSTALLCMD} -m 755 config/gcore_trace.sh $(DESTDIR)$(etcdir)/ctdb; fi
 
 test: all
 	tests/run_tests.sh
