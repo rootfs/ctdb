@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.49
+Version: 1.2.50
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -146,6 +146,8 @@ development libraries for ctdb
 
 %changelog
 
+* Wed Sep 12 2012 : Version 1.2.50
+  - Add utility function to dump core and use it for "unknown family, 0" error
 * Tue Aug 21 2012 : Version 1.2.49
  - logging: Close unix socket /tmp/ctdb.socket in syslogd process
  - Initscript: Kill any existing ctdbd processes if the ping succeeds
