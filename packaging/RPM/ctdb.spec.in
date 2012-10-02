@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.50
+Version: 1.2.51
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -146,6 +146,9 @@ development libraries for ctdb
 
 %changelog
 
+* Tue Oct 02 2012 : Version 1.2.51
+  - NATGW eventscript does not fail on recovered in case of misconfiguration
+  - Map TEVENT_DEBUG_FATAL to DEBUG_CRIT
 * Wed Sep 12 2012 : Version 1.2.50
   - Add utility function to dump core and use it for "unknown family, 0" error
 * Tue Aug 21 2012 : Version 1.2.49
