@@ -117,11 +117,6 @@ int start_syslog_daemon(struct ctdb_context *ctdb)
 	}
 
 	debug_extra = talloc_asprintf(NULL, "syslogd:");
-
-	/* Close unix socket since syslogd does not need it */
-	close(ctdb->daemon.sd);
-	ctdb->daemon.sd = -1;
-
 	talloc_free(ctdb->ev);
 	ctdb->ev = event_context_init(NULL);
 	tevent_loop_allow_nesting(ctdb->ev);
