@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.51
+Version: 1.2.52
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -146,6 +146,8 @@ development libraries for ctdb
 
 %changelog
 
+* Fri Oct 05 2012 : Version 1.2.52
+  - util: ctdb_fork() closes all sockets opened by the main daemon
 * Tue Oct 02 2012 : Version 1.2.51
   - NATGW eventscript does not fail on recovered in case of misconfiguration
   - Map TEVENT_DEBUG_FATAL to DEBUG_CRIT
