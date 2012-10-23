@@ -561,7 +561,6 @@ static void ctdb_event_script_timeout(struct event_context *ev, struct timed_eve
 	case CTDB_EVENT_TAKE_IP:
 	case CTDB_EVENT_RELEASE_IP:
 	case CTDB_EVENT_STOPPED:
-	case CTDB_EVENT_MONITOR:
 	case CTDB_EVENT_STATUS:
 		state->scripts->scripts[state->current].status = 0;
 		DEBUG(DEBUG_ERR,("Ignoring hung script for %s call %d\n", state->options, state->call));
