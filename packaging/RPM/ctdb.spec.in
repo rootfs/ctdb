@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.39
-Release: 3GITHASH
+Release: 4GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -144,6 +144,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Wed Feb 29 2012 : version 1.2.39-4
+ - change default vacuuming timeout to 120 seconds
 * Tue Feb 28 2012 : version 1.2.39-3
  - fix for memory corruption S1034147
  - fix for imbalance after addip S1035305
