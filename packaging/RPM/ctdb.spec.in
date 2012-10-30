@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.53
+Version: 1.2.54
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -146,6 +146,9 @@ development libraries for ctdb
 
 %changelog
 
+* Wed Oct 30 2012 : Version 1.2.54
+  - Protect against double free of active monitor callback state during shutdown
+  - Remove duplicate code to set tunables from initscript
 * Fri Oct 26 2012 : Version 1.2.53
   - Initscript: backup corrupt non-persistent database before starting CTDB
 * Fri Oct 05 2012 : Version 1.2.52
