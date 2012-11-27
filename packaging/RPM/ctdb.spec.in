@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.54
+Version: 1.2.55
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -146,6 +146,12 @@ development libraries for ctdb
 
 %changelog
 
+* Tue Nov 27 2012 : Version 1.2.55
+  - Do not ignore timed out monitor events
+  - Track nodes that fail takeover run and ban them
+  - For new interfaces mark the link up by default after startup
+  - In 10.interface eventscript use configured interaces to monitor
+  - Do not set the initial interface when adding new public address
 * Wed Oct 30 2012 : Version 1.2.54
   - Protect against double free of active monitor callback state during shutdown
   - Remove duplicate code to set tunables from initscript
