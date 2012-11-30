@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.39
-Release: 5GITHASH
+Release: 7GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -144,6 +144,9 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Fri Nov 30 2012 : version 1.2.39-7
+  - Do not ignore timed out monitor events
+  - Track the nodes that fail takeover run and set culprit count
 * Mon Mar 5 2012 : version 1.2.39-5
  - remove change for 35306
 * Wed Feb 29 2012 : version 1.2.39-4
