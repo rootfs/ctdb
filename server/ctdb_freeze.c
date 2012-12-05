@@ -256,6 +256,26 @@ static int ctdb_freeze_waiter_destructor(struct ctdb_freeze_waiter *w)
 }
 
 /*
+ * Run an external script to check if there is a deadlock situation
+ */
+static void ctdb_debug_locks(void)
+{
+	const char *cmd = getenv("CTDB_DEBUG_LOCKS");
+	int pid;
+
+	if (cmd == NULL) {
+		return;
+	}
+
+	pid = fork();
+
+	/* Execute only in child process */
+	if (pid == 0) {
+		execl(cmd, cmd, NULL);
+	}
+}
+
+/*
   start the freeze process for a certain priority
  */
 int ctdb_start_freeze(struct ctdb_context *ctdb, uint32_t priority)
@@ -283,6 +303,10 @@ int ctdb_start_freeze(struct ctdb_context *ctdb, uint32_t priority)
 		ctdb->freeze_handles[priority] = ctdb_freeze_lock(ctdb, priority);
 		CTDB_NO_MEMORY(ctdb, ctdb->freeze_handles[priority]);
 		ctdb->freeze_mode[priority] = CTDB_FREEZE_PENDING;
+	} else {
+		/* The previous free lock child has not yet been able to get locks.
+		 * Invoke debugging script */
+		ctdb_debug_locks();
 	}
 
 	return 0;
