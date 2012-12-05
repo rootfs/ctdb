@@ -113,6 +113,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/ctdb/events.d/91.lvs
 %{_sysconfdir}/ctdb/statd-callout
 %{_sysconfdir}/ctdb/interface_modify.sh
+%{_sysconfdir}/ctdb/debug_locks.sh
 %{_sbindir}/ctdbd
 %{_bindir}/ctdb
 %{_bindir}/smnotify
