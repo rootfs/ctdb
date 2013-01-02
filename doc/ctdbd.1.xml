@@ -675,12 +675,10 @@ ctdb will try to reassign public IP addresses onto the new node as a way to dist
     </refsect2>
 
     <refsect2><title>RecoverPDBBySeqNum</title>
-    <para>Default: 0</para>
+    <para>Default: 1</para>
     <para>
-	When set to non-zero, this will change how the recovery process for persistent
-	databases ar performed.
-	By default, when performing a database recovery, for normal as for persistent
-	databases, recovery is record-by-record and recovery process simply collects
+	When set to zero, database recovery for persistent
+	databases is record-by-record and recovery process simply collects
 	the most recent version of every individual record.
     </para>
     <para>
@@ -688,6 +686,10 @@ ctdb will try to reassign public IP addresses onto the new node as a way to dist
 	as a whole db and not by individual records. The node that contains the highest
 	value stored in the record "__db_sequence_number__" is selected and the copy of
 	that nodes database is used as the recovered database.
+    </para>
+    <para>
+        By default, recovery of persistent databases is done using __db_sequence_number__
+	record.
     </para>
     </refsect2>
 

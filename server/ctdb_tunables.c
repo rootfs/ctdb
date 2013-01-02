@@ -71,7 +71,7 @@ static const struct {
 	{ "DeferredAttachTO",  120,  offsetof(struct ctdb_tunable, deferred_attach_timeout) },
 	{ "AllowClientDBAttach", 1, offsetof(struct ctdb_tunable, allow_client_db_attach) },
 	{ "DeferredRebalanceOnNodeAdd", 300, offsetof(struct ctdb_tunable, deferred_rebalance_on_node_add) },
-	{ "RecoverPDBBySeqNum",  0, offsetof(struct ctdb_tunable, recover_pdb_by_seqnum) },
+	{ "RecoverPDBBySeqNum",  1, offsetof(struct ctdb_tunable, recover_pdb_by_seqnum) },
 };
 
 /*

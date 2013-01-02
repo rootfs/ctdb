@@ -404,11 +404,13 @@ Use with caution! Normally when a node becomes available to the cluster ctdb wil
 When you enable this tunable, CTDB will no longer attempt to rebalance the cluster by failing IP addresses back to the new nodes\&. An unbalanced cluster will therefore remain unbalanced until there is manual intervention from the administrator\&. When this parameter is set, you can manually fail public IP addresses over to the new node(s) using the \*(Aqctdb moveip\*(Aq command\&.
 .SS "RecoverPDBBySeqNum"
 .PP
-Default: 0
+Default: 1
 .PP
-When set to non\-zero, this will change how the recovery process for persistent databases ar performed\&. By default, when performing a database recovery, for normal as for persistent databases, recovery is record\-by\-record and recovery process simply collects the most recent version of every individual record\&.
+When set to zero, database recovery for persistent databases is record\-by\-record and recovery process simply collects the most recent version of every individual record\&.
 .PP
 When set to non\-zero, persistent databases will instead be recovered as a whole db and not by individual records\&. The node that contains the highest value stored in the record "__db_sequence_number__" is selected and the copy of that nodes database is used as the recovered database\&.
+.PP
+By default, recovery of persistent databases is done using __db_sequence_number__ record\&.
 .SH "LVS"
 .PP
 LVS is a mode where CTDB presents one single IP address for the entire cluster\&. This is an alternative to using public IP addresses and round\-robin DNS to loadbalance clients across the cluster\&.
