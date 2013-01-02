@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.55
+Version: 1.2.56
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -147,6 +147,9 @@ development libraries for ctdb
 
 %changelog
 
+* Wed Dec 02 2013 : Version 1.2.56
+  - When deadlock condition is detected, run extrnal script to log debugging information
+  - Use __db_sequence_number based recovery of persistent databases by default
 * Tue Nov 27 2012 : Version 1.2.55
   - Do not ignore timed out monitor events
   - Track nodes that fail takeover run and ban them
