@@ -13,7 +13,7 @@ out=$( cat /proc/locks |
     while read pid rest ; do
 	pname=$(readlink /proc/$pid/exe)
 	echo $pid $pname $rest
-    done | sed -e "$sed_fu" | grep "\.tdb" )
+    done | sed -e "$sed_cmd" | grep "\.tdb" )
 
 if [ -n "$out" ]; then
     # Log information about locks
