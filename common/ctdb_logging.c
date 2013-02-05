@@ -86,7 +86,14 @@ void log_ringbuffer(const char *format, ...)
 	va_end(ap);
 }
 
-
+void ctdb_log_ringbuffer_free(void)
+{
+	if (log_entries != NULL) {
+		free(log_entries);
+		log_entries = NULL;
+	}
+	log_ringbuf_size = 0;
+}
 
 static void ctdb_collect_log(struct ctdb_context *ctdb, struct ctdb_get_log_addr *log_addr)
 {
