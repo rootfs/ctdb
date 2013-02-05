@@ -2,12 +2,12 @@
 .\"     Title: ctdbd
 .\"    Author: [FIXME: author] [see http://docbook.sf.net/el/author]
 .\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
-.\"      Date: 01/02/2013
+.\"      Date: 02/05/2013
 .\"    Manual: CTDB - clustered TDB database
 .\"    Source: ctdb
 .\"  Language: English
 .\"
-.TH "CTDBD" "1" "01/02/2013" "ctdb" "CTDB \- clustered TDB database"
+.TH "CTDBD" "1" "02/05/2013" "ctdb" "CTDB \- clustered TDB database"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -411,6 +411,15 @@ When set to zero, database recovery for persistent databases is record\-by\-reco
 When set to non\-zero, persistent databases will instead be recovered as a whole db and not by individual records\&. The node that contains the highest value stored in the record "__db_sequence_number__" is selected and the copy of that nodes database is used as the recovered database\&.
 .PP
 By default, recovery of persistent databases is done using __db_sequence_number__ record\&.
+.SS "FetchCollapse"
+.PP
+Default: 1
+.PP
+When many clients across many nodes try to access the same record at the same time this can lead to a fetch storm where the record becomes very active and bounces between nodes very fast\&. This leads to high CPU utilization of the ctdbd daemon, trying to bounce that record around very fast, and poor performance\&.
+.PP
+This parameter is used to activate a fetch\-collapse\&. A fetch\-collapse is when we track which records we have requests in flight so that we only keep one request in flight from a certain node, even if multiple smbd processes are attemtping to fetch the record at the same time\&. This can improve performance and reduce CPU utilization for certain workloads\&.
+.PP
+This timeout controls if we should collapse multiple fetch operations of the same record into a single request and defer all duplicates or not\&.
 .SH "LVS"
 .PP
 LVS is a mode where CTDB presents one single IP address for the entire cluster\&. This is an alternative to using public IP addresses and round\-robin DNS to loadbalance clients across the cluster\&.
