@@ -117,6 +117,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/ctdb/debug_locks.sh
 %{_sbindir}/ctdbd
 %{_bindir}/ctdb
+%{_bindir}/ctdb_lockwait_helper
 %{_bindir}/smnotify
 %{_bindir}/ping_pong
 %{_bindir}/ltdbtool

@@ -141,7 +141,11 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 {
 	struct lockwait_handle *result, *i;
 	int ret;
-	pid_t parent = getpid();
+	int datafd[2];
+	TDB_DATA tmp_key, tmp_data;
+	struct ctdb_marshall_buffer *m;
+	const char *prog = BINDIR "/ctdb_lockwait_helper";
+	char arg0[128], arg1[8], arg2[8], arg3[8];
 
 	CTDB_INCREMENT_STAT(ctdb_db->ctdb, lockwait_calls);
 	CTDB_INCREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
@@ -178,17 +182,60 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 		return result;
 	}
 
-	ret = pipe(result->fd);
+	/* Create data for the child process */
+	m = talloc_zero(result, struct ctdb_marshall_buffer);
+	if (m == NULL) {
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
+	}
 
+	tmp_key.dptr = (uint8_t *)talloc_strdup(result, "dbpath");
+	if (tmp_key.dptr == NULL) {
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
+	}
+	tmp_key.dsize = strlen((char *)tmp_key.dptr);
+
+	tmp_data.dptr = discard_const_p(uint8_t, ctdb_db->db_path);
+	tmp_data.dsize = strlen((char *)tmp_data.dptr);
+
+	m = ctdb_marshall_add(result, m, ctdb_db->db_id, 0, tmp_key, NULL, tmp_data);
+	if (m == NULL) {
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
+	}
+	talloc_free(tmp_key.dptr);
+
+	tmp_key.dptr = (uint8_t *)talloc_strdup(result, "dbkey");
+	if (tmp_key.dptr == NULL) {
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
+	}
+	tmp_key.dsize = strlen((char *)tmp_key.dptr);
+
+	m = ctdb_marshall_add(result, m, ctdb_db->db_id, 0, tmp_key, NULL, key);
+	if (m == NULL) {
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
+	}
+	talloc_free(tmp_key.dptr);
+
+	tmp_data = ctdb_marshall_finish(m);
+
+	ret = pipe(result->fd);
 	if (ret != 0) {
 		talloc_free(result);
 		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
 		return NULL;
 	}
 
-	result->child = ctdb_fork(ctdb_db->ctdb);
-
-	if (result->child == (pid_t)-1) {
+	ret = pipe(datafd);
+	if (ret != 0) {
 		close(result->fd[0]);
 		close(result->fd[1]);
 		talloc_free(result);
@@ -196,21 +243,36 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 		return NULL;
 	}
 
-	if (result->child == 0) {
-		char c = 0;
+	/* Since we are going to eec a helper binary, no point copying
+	 * pagetables and then releasing them. Use vfork() instead of fork().
+	 */
+	result->child = vfork();
+
+	if (result->child == (pid_t)-1) {
 		close(result->fd[0]);
-		debug_extra = talloc_asprintf(NULL, "chainlock-%s:", ctdb_db->db_name);
-		tdb_chainlock(ctdb_db->ltdb->tdb, key);
-		write(result->fd[1], &c, 1);
-		/* make sure we die when our parent dies */
-		while (kill(parent, 0) == 0 || errno != ESRCH) {
-			sleep(5);
-		}
-		_exit(0);
+		close(result->fd[1]);
+		close(datafd[0]);
+		close(datafd[1]);
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
 	}
 
+	if (result->child == 0) {
+		sprintf(arg0, "ctdb-lock-%s", ctdb_db->db_name);
+		sprintf(arg1, "%d", datafd[0]);
+		sprintf(arg2, "%d", result->fd[1]);
+		sprintf(arg3, "%d", ctdb_db->ctdb->tunable.database_hash_size);
+
+		close(result->fd[0]);
+		close(datafd[1]);
+
+		execl(prog, arg0, arg1, arg2, arg3, NULL);
+		_exit(1);
+	}
+
+	close(datafd[0]);
 	close(result->fd[1]);
-	set_close_on_exec(result->fd[0]);
 
 	/* This is an active lockwait child process */
 	DLIST_ADD_END(ctdb_db->lockwait_active, result, NULL);
@@ -219,6 +281,25 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 
 	ctdb_db->pending_requests++;
 	talloc_set_destructor(result, lockwait_destructor);
+
+	set_nonblocking(datafd[1]);
+	ret = write(datafd[1], &tmp_data.dsize, sizeof(tmp_data.dsize));
+	if (ret < 0) {
+		close(datafd[1]);
+		close(result->fd[0]);
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
+	}
+	ret = write(datafd[1], tmp_data.dptr, tmp_data.dsize);
+	if (ret < 0) {
+		close(datafd[1]);
+		close(result->fd[0]);
+		talloc_free(result);
+		CTDB_DECREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
+		return NULL;
+	}
+	close(datafd[1]);
 
 	result->fde = event_add_fd(ctdb_db->ctdb->ev, result, result->fd[0],
 				   EVENT_FD_READ, lockwait_handler,
