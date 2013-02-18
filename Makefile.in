@@ -75,7 +75,7 @@ TEST_BINS=tests/bin/ctdb_bench tests/bin/ctdb_fetch tests/bin/ctdb_fetch_one \
 	tests/bin/ctdb_takeover_tests tests/bin/ctdb_update_record \
 	@INFINIBAND_BINS@
 
-BINS = bin/ctdb @CTDB_SCSI_IO@ bin/smnotify bin/ping_pong bin/ltdbtool
+BINS = bin/ctdb @CTDB_SCSI_IO@ bin/smnotify bin/ping_pong bin/ltdbtool bin/ctdb_lockwait_helper
 SBINS = bin/ctdbd
 
 DIRS = lib bin tests/bin
@@ -111,6 +111,10 @@ dirs:
 bin/ctdbd: $(CTDB_SERVER_OBJ)
 	@echo Linking $@
 	@$(CC) $(CFLAGS) -o $@ $(CTDB_SERVER_OBJ) $(LIB_FLAGS)
+
+bin/ctdb_lockwait_helper: server/ctdb_lockwait_helper.o @TDB_OBJ@
+	@echo Linking $@
+	@$(CC) $(CFLAGS) -o $@ $^ $(LIB_FLAGS)
 
 libctdb/libctdb.a: $(CTDB_LIB_OBJ)
 	@echo Linking $@
@@ -255,6 +259,7 @@ install: all
 	${INSTALLCMD} -m 755 bin/smnotify $(DESTDIR)$(bindir)
 	$(INSTALLCMD) -m 755 bin/ping_pong $(DESTDIR)$(bindir)
 	$(INSTALLCMD) -m 755 bin/ltdbtool $(DESTDIR)$(bindir)
+	$(INSTALLCMD) -m 755 bin/ctdb_lockwait_helper $(DESTDIR)$(bindir)
 	$(INSTALLCMD) -m 755 libctdb/libctdb.a $(DESTDIR)$(libdir)
 	${INSTALLCMD} -m 644 include/ctdb.h $(DESTDIR)$(includedir)
 	${INSTALLCMD} -m 644 include/ctdb_client.h $(DESTDIR)$(includedir)
