@@ -2074,11 +2074,18 @@ int ctdb_takeover_run(struct ctdb_context *ctdb, struct ctdb_node_map *nodemap,
 	}
 
 ipreallocated:
-	/* tell all nodes to update natwg */
-	/* send the flags update natgw on all connected nodes */
+	/*
+	 * Tell all connected, but not stopped (since they are in
+	 * recovery and will reject the event), nodes to run
+	 * eventscripts to process the "ipreallocated" event.  This
+	 * can do a lot of things, including restarting services to
+	 * reconfigure them if public IPs have moved.  Once upon a
+	 * time this event only used to update natwg.
+	 */
 	data.dptr  = discard_const("ipreallocated");
 	data.dsize = strlen((char *)data.dptr) + 1; 
-	nodes = list_of_connected_nodes(ctdb, nodemap, tmp_ctx, true);
+	nodes = list_of_nodes(ctdb, nodemap, tmp_ctx,
+			      NODE_FLAGS_DISCONNECTED|NODE_FLAGS_STOPPED, -1);
 	if (ctdb_client_async_control(ctdb, CTDB_CONTROL_RUN_EVENTSCRIPTS,
 				      nodes, 0, TAKEOVER_TIMEOUT(),
 				      false, data,
