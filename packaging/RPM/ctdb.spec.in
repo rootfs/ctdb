@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.57
+Version: 1.2.58
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -148,6 +148,12 @@ development libraries for ctdb
 
 %changelog
 
+* Tue Feb 19 2013 : Version 1.2.58
+  - Terminate traverse children when traverse operation times out
+  - Rewrite socket handling code to read all available data
+  - Remove call to "smbstatus -np" as part of periodic cleanup
+  - Free log ringbuffer in ctdb_fork() for child processes
+  - Use preallocation for pulldb buffer during recovery, instead of growing it
 * Thu Feb 07 2013 : Version 1.2.57
   - Backport fetch lock collapse patches
   - Backport debugging of hung eventscripts via external script
