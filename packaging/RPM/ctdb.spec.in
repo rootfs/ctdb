@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Version: 1.2.39
-Release: 7GITHASH
+Release: 8GITHASH
 Epoch: 0
 License: GNU GPL version 3
 Group: System Environment/Daemons
@@ -144,6 +144,8 @@ development libraries for ctdb
 %{_libdir}/libctdb.a
 
 %changelog
+* Wed Feb 20 2013 : version 1.2.39-8
+  - Don't send "ipreallocate" events to stopped nodes
 * Fri Nov 30 2012 : version 1.2.39-7
   - Do not ignore timed out monitor events
   - Track the nodes that fail takeover run and set culprit count
