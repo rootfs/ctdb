@@ -477,13 +477,13 @@ static int ctdb_persistent_store(struct ctdb_persistent_write_state *state)
 		   ctdb_ltdb_fetch will unconditionally create a record
 		 */
 		if (state->flags & UPDATE_FLAGS_REPLACE_ONLY) {
-			TDB_DATA rec;
-			rec = tdb_fetch(state->ctdb_db->ltdb->tdb, key);
-			if (rec.dsize == 0) {
+			TDB_DATA rec2;
+			rec2 = tdb_fetch(state->ctdb_db->ltdb->tdb, key);
+			if (rec2.dsize == 0) {
 				talloc_free(tmp_ctx);
 				continue;
 			}
-			free(rec.dptr);
+			free(rec2.dptr);
 		}
 
 		/* fetch the old header and ensure the rsn is less than the new rsn */
