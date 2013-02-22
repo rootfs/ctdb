@@ -228,6 +228,7 @@ struct tevent_context {
 
 	/* list of timed events - used by common code */
 	struct tevent_timer *timer_events;
+	struct tevent_timer *last_zero_timer;
 
 	/* list of immediate events - used by common code */
 	struct tevent_immediate *immediate_events;
