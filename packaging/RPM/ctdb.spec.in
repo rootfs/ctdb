@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.58
+Version: 1.2.59
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -149,6 +149,13 @@ development libraries for ctdb
 
 %changelog
 
+* Wed Mar 06 2013 : Version 1.2.59
+  - Do not send ipreallocated event to stopped nodes
+  - Do not fail "ctdb delip" command if IP cannot be moved
+  - Add an index db for faster searches of message handlers
+  - Scheule immediate events using tevent_schedule_immediate
+  - Optimize adding of new timer events (tevent library)
+  - Use standalone helper for locking a record
 * Tue Feb 19 2013 : Version 1.2.58
   - Terminate traverse children when traverse operation times out
   - Rewrite socket handling code to read all available data
