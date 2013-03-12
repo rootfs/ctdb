@@ -89,6 +89,9 @@ static void lockwait_handler(struct event_context *ev, struct fd_event *fde,
 	TDB_DATA key = h->key;
 	struct tdb_context *tdb = h->ctdb_db->ltdb->tdb;
 	TALLOC_CTX *tmp_ctx = talloc_new(ev);
+	char result;
+	ssize_t nread;
+	char *msg;
 
 	key.dptr = talloc_memdup(tmp_ctx, key.dptr, key.dsize);
 	h->ctdb_db->pending_requests--;
@@ -104,6 +107,19 @@ static void lockwait_handler(struct event_context *ev, struct fd_event *fde,
 		if (tdb_chainlock_nonblock(tdb, key) == 0) {
 			ctdb_fatal(h->ctdb, "got chain lock while lockwait child active");
 		}
+	}
+
+	nread = read(h->fd[0], &result, sizeof(result));
+	if (nread == -1) {
+		asprintf(&msg, "lockwait child read failed: %s\n", strerror(errno));
+		ctdb_fatal(h->ctdb, msg);
+	}
+	if (nread == 0) {
+		ctdb_fatal(h->ctdb, "lockwait child exited early\n");
+	}
+	if (result != 0) {
+		asprintf(&msg, "lockwait child wrote %d\n", (int)result);
+		ctdb_fatal(h->ctdb, msg);
 	}
 
 	tdb_chainlock_mark(tdb, key);
