@@ -243,7 +243,7 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 		return NULL;
 	}
 
-	/* Since we are going to eec a helper binary, no point copying
+	/* Since we are going to exec a helper binary, no point copying
 	 * pagetables and then releasing them. Use vfork() instead of fork().
 	 */
 	result->child = vfork();
