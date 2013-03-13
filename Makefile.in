@@ -112,7 +112,7 @@ bin/ctdbd: $(CTDB_SERVER_OBJ)
 	@echo Linking $@
 	@$(CC) $(CFLAGS) -o $@ $(CTDB_SERVER_OBJ) $(LIB_FLAGS)
 
-bin/ctdb_lockwait_helper: server/ctdb_lockwait_helper.o @TDB_OBJ@
+bin/ctdb_lockwait_helper: server/ctdb_lockwait_helper.o lib/util/util_file.o @TDB_OBJ@ @TALLOC_OBJ@
 	@echo Linking $@
 	@$(CC) $(CFLAGS) -o $@ $^ $(LIB_FLAGS)
 
