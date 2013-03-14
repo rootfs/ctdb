@@ -206,7 +206,11 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 	arg0 = talloc_asprintf(result, "ctdb_lock-%s", ctdb_db->db_name);
 	arg1 = talloc_asprintf(result, "%d", result->fd[1]);
 	arg2 = talloc_strdup(result, ctdb_db->db_path);
-	arg3 = hex_encode_talloc(result, key.dptr, key.dsize);
+	if (key.dsize == 0) {
+		arg3 = talloc_strdup(result, "NULL");
+	} else {
+		arg3 = hex_encode_talloc(result, key.dptr, key.dsize);
+	}
 
 	if (!arg0 || !arg1 || !arg2 || !arg3) {
 		close(result->fd[0]);

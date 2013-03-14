@@ -50,7 +50,12 @@ int main(int argc, char *argv[])
 	dbkey = argv[3];
 
 	/* Convert hex key to key */
-	key.dptr = hex_decode_talloc(NULL, dbkey, &key.dsize);
+	if (strcmp(dbkey, "NULL") == 0) {
+		key.dptr = NULL;
+		key.dsize = 0;
+	} else {
+		key.dptr = hex_decode_talloc(NULL, dbkey, &key.dsize);
+	}
 
 	tdb = tdb_open(dbpath, 0, TDB_DEFAULT, O_RDWR, 0600);
 	if (tdb == NULL) {
