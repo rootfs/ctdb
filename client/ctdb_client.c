@@ -263,9 +263,6 @@ int ctdb_socket_connect(struct ctdb_context *ctdb)
 		return -1;
 	}
 
-	set_nonblocking(ctdb->daemon.sd);
-	set_close_on_exec(ctdb->daemon.sd);
-	
 	if (connect(ctdb->daemon.sd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
 		close(ctdb->daemon.sd);
 		ctdb->daemon.sd = -1;
@@ -273,6 +270,9 @@ int ctdb_socket_connect(struct ctdb_context *ctdb)
 		return -1;
 	}
 
+	set_nonblocking(ctdb->daemon.sd);
+	set_close_on_exec(ctdb->daemon.sd);
+	
 	ctdb->daemon.queue = ctdb_queue_setup(ctdb, ctdb, ctdb->daemon.sd, 
 					      CTDB_DS_ALIGNMENT, 
 					      ctdb_client_read_cb, ctdb, "to-ctdbd");
