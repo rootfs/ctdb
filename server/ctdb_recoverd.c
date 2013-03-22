@@ -3053,7 +3053,6 @@ again:
 	/* check that we (recovery daemon) and the local ctdb daemon
 	   agrees on whether we are banned or not
 	*/
-//qqq
 
 	/* remember our own node flags */
 	rec->node_flags = nodemap->nodes[pnn].flags;
