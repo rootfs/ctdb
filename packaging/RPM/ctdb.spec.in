@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.59
+Version: 1.2.60
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -149,6 +149,11 @@ development libraries for ctdb
 
 %changelog
 
+* Mon Mar 25 2013 : Version 1.2.60
+  - Do not set close_on_exec for stdio/stderr of child
+  - Check result from lockwait child
+  - Pass locking information on commandline to lockwait helper
+  - Allow for zero length key requests
 * Wed Mar 06 2013 : Version 1.2.59
   - Do not send ipreallocated event to stopped nodes
   - Do not fail "ctdb delip" command if IP cannot be moved
