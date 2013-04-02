@@ -111,6 +111,7 @@ int ctdb_dispatch_message(struct ctdb_context *ctdb, uint64_t srvid, TDB_DATA da
 	ret = message_list_db_fetch(ctdb, key, &hdata);
 	if (ret == 0) {
 		h = *(struct ctdb_message_list_header **)hdata.dptr;
+		free(hdata.dptr);
 
 		for (m=h->m; m; m=m->next) {
 			m->message_handler(ctdb, srvid, data, m->message_private);
@@ -123,6 +124,7 @@ int ctdb_dispatch_message(struct ctdb_context *ctdb, uint64_t srvid, TDB_DATA da
 	ret = message_list_db_fetch(ctdb, key, &hdata);
 	if (ret == 0) {
 		h = *(struct ctdb_message_list_header **)hdata.dptr;
+		free(hdata.dptr);
 
 		for(m=h->m; m; m=m->next) {
 			m->message_handler(ctdb, srvid, data, m->message_private);
@@ -228,6 +230,7 @@ int ctdb_register_message_handler(struct ctdb_context *ctdb,
 		talloc_set_destructor(h, message_header_destructor);
 	} else {
 		h = *(struct ctdb_message_list_header **)data.dptr;
+		free(data.dptr);
 	}
 
 	m->h = h;
@@ -256,6 +259,8 @@ int ctdb_deregister_message_handler(struct ctdb_context *ctdb, uint64_t srvid, v
 	}
 
 	h = *(struct ctdb_message_list_header **)data.dptr;
+	free(data.dptr);
+
 	for (m=h->m; m; m=m->next) {
 		if (m->message_private == private_data) {
 			talloc_free(m);
@@ -283,6 +288,7 @@ bool ctdb_check_message_handler(struct ctdb_context *ctdb, uint64_t srvid)
 	}
 
 	h = *(struct ctdb_message_list_header **)data.dptr;
+	free(data.dptr);
 	if (h->m == NULL) {
 		return false;
 	}
