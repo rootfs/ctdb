@@ -545,7 +545,7 @@ enum ctdb_controls {CTDB_CONTROL_PROCESS_EXISTS          = 0,
 		    CTDB_CONTROL_SET_DEBUG               = 8,
 		    CTDB_CONTROL_GET_DBMAP               = 9,
 		    CTDB_CONTROL_GET_NODEMAPv4           = 10, /* obsolete */
-		    CTDB_CONTROL_SET_DMASTER             = 11,
+		    CTDB_CONTROL_SET_DMASTER             = 11, /* obsolete */
 		    /* #12 removed */
 		    CTDB_CONTROL_PULL_DB                 = 13,
 		    CTDB_CONTROL_PUSH_DB                 = 14,
@@ -1264,7 +1264,6 @@ struct ctdb_rec_data *ctdb_marshall_loop_next(struct ctdb_marshall_buffer *m, st
 
 int32_t ctdb_control_pull_db(struct ctdb_context *ctdb, TDB_DATA indata, TDB_DATA *outdata);
 int32_t ctdb_control_push_db(struct ctdb_context *ctdb, TDB_DATA indata);
-int32_t ctdb_control_set_dmaster(struct ctdb_context *ctdb, TDB_DATA indata);
 
 int32_t ctdb_control_set_recmode(struct ctdb_context *ctdb, 
 				 struct ctdb_req_control *c,
