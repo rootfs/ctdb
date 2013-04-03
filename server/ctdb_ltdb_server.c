@@ -142,11 +142,14 @@ static int ctdb_ltdb_store_server(struct ctdb_db_context *ctdb_db,
 	}
 
 	if (keep) {
-		if ((data.dsize == 0) &&
-		    !ctdb_db->persistent &&
+		if (!ctdb_db->persistent &&
 		    (ctdb_db->ctdb->pnn == header->dmaster))
 		{
-			schedule_for_deletion = true;
+			header->rsn++;
+
+			if (data.dsize == 0) {
+				schedule_for_deletion = true;
+			}
 		}
 		remove_from_delete_queue = !schedule_for_deletion;
 	}
