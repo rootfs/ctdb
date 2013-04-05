@@ -158,7 +158,7 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 	struct lockwait_handle *result, *i;
 	int ret;
 	const char *prog = BINDIR "/ctdb_lockwait_helper";
-	char *arg0, *arg1, *arg2, *arg3;
+	char *arg0, *arg1, *arg2, *arg3, *arg4;
 
 	CTDB_INCREMENT_STAT(ctdb_db->ctdb, lockwait_calls);
 	CTDB_INCREMENT_STAT(ctdb_db->ctdb, pending_lockwait_calls);
@@ -204,15 +204,16 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 
 	/* Create data for the child process */
 	arg0 = talloc_asprintf(result, "ctdb_lock-%s", ctdb_db->db_name);
-	arg1 = talloc_asprintf(result, "%d", result->fd[1]);
-	arg2 = talloc_strdup(result, ctdb_db->db_path);
+	arg1 = talloc_asprintf(result, "%d", ctdb_db->ctdb->ctdbd_pid);
+	arg2 = talloc_asprintf(result, "%d", result->fd[1]);
+	arg3 = talloc_strdup(result, ctdb_db->db_path);
 	if (key.dsize == 0) {
-		arg3 = talloc_strdup(result, "NULL");
+		arg4 = talloc_strdup(result, "NULL");
 	} else {
-		arg3 = hex_encode_talloc(result, key.dptr, key.dsize);
+		arg4 = hex_encode_talloc(result, key.dptr, key.dsize);
 	}
 
-	if (!arg0 || !arg1 || !arg2 || !arg3) {
+	if (!arg0 || !arg1 || !arg2 || !arg3 || !arg4) {
 		close(result->fd[0]);
 		close(result->fd[1]);
 		talloc_free(result);
@@ -236,7 +237,7 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 	if (result->child == 0) {
 		close(result->fd[0]);
 
-		execl(prog, arg0, arg1, arg2, arg3, NULL);
+		execl(prog, arg0, arg1, arg2, arg3, arg4, NULL);
 		_exit(1);
 	}
 
@@ -244,6 +245,7 @@ struct lockwait_handle *ctdb_lockwait(struct ctdb_db_context *ctdb_db,
 	talloc_free(arg1);
 	talloc_free(arg2);
 	talloc_free(arg3);
+	talloc_free(arg4);
 
 	close(result->fd[1]);
 

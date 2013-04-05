@@ -40,14 +40,15 @@ int main(int argc, char *argv[])
 	char result = 1;
 	int ppid;
 
-	if (argc != 4) {
-		fprintf(stderr, "Usage: %s <output-fd> <db-path> <db-key>\n", argv[0]);
+	if (argc != 5) {
+		fprintf(stderr, "Usage: %s <ctdbd-pid> <output-fd> <db-path> <db-key>\n", argv[0]);
 		exit(1);
 	}
 
-	write_fd = atoi(argv[1]);
-	dbpath = argv[2];
-	dbkey = argv[3];
+	ppid = atoi(argv[1]);
+	write_fd = atoi(argv[2]);
+	dbpath = argv[3];
+	dbkey = argv[4];
 
 	/* Convert hex key to key */
 	if (strcmp(dbkey, "NULL") == 0) {
@@ -71,7 +72,6 @@ int main(int argc, char *argv[])
 	result = 0;
 	send_result(write_fd, result);
 
-	ppid = getppid();
 	while (kill(ppid, 0) == 0 || errno != ESRCH) {
 		sleep(5);
 	}
