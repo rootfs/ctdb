@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.60
+Version: 1.2.61
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,13 @@ development libraries for ctdb
 
 %changelog
 
+* Fri Apr 05 2013 : Version 1.2.61
+  - Free message list header if all message handlers are freed
+  - Use tdb_parse_record instead of tdb_fetch to avoid memory leaks
+  - Set client socket to non-blocking only after connect succeeds
+  - Make sure statd-callout script is always run as root
+  - Use IP->node mapping info from nodes hosting that IP
+  - Pass CTDB daemon pid on command line to lockwait helper
 * Mon Mar 25 2013 : Version 1.2.60
   - Do not set close_on_exec for stdio/stderr of child
   - Check result from lockwait child
