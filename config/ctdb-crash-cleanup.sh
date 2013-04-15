@@ -17,8 +17,10 @@
 	exit 1
 }
 
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:$PATH
+
 # if ctdb is running, just return
-ctdb status 2>/dev/null && {
+service ctdb status >/dev/null 2>&1 && {
     exit 0
 }
 
