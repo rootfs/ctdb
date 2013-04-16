@@ -29,7 +29,7 @@ service ctdb status >/dev/null 2>&1 && {
 	[ -z "$_IP_HELD" ] || {
 		_IFACE=`echo $_IP_HELD | sed -e "s/.*\s//"`
 		_NM=`echo $_IP_HELD | sed -e "s/.*$_IP\///" -e "s/\s.*//"`
-		logger "Removing public address $_IP/$_NM from device $_IFACE"
+		logger -t "ctdbd" "ctdb-crash-cleanup.sh: Removing public address $_IP/$_NM from device $_IFACE"
 		/sbin/ip addr del $_IP/$_NM dev $_IFACE
 	}
 done
