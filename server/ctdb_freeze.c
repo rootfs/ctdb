@@ -190,7 +190,7 @@ static struct ctdb_freeze_handle *ctdb_freeze_lock(struct ctdb_context *ctdb, ui
 		return NULL;
 	}
 	
-	h->child = fork();
+	h->child = ctdb_fork(ctdb);
 	if (h->child == -1) {
 		DEBUG(DEBUG_ERR,("Failed to fork child for ctdb_freeze_lock\n"));
 		talloc_free(h);

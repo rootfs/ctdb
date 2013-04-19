@@ -774,7 +774,7 @@ int32_t ctdb_control_set_recmode(struct ctdb_context *ctdb,
 		return -1;
 	}
 
-	state->child = fork();
+	state->child = ctdb_fork(ctdb);
 	if (state->child == (pid_t)-1) {
 		close(state->fd[0]);
 		close(state->fd[1]);

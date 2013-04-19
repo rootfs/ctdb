@@ -3781,7 +3781,7 @@ int ctdb_start_recoverd(struct ctdb_context *ctdb)
 
 	ctdb->ctdbd_pid = getpid();
 
-	ctdb->recoverd_pid = fork();
+	ctdb->recoverd_pid = ctdb_fork(ctdb);
 	if (ctdb->recoverd_pid == -1) {
 		return -1;
 	}
