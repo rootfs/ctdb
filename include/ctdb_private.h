@@ -1034,6 +1034,7 @@ bool ctdb_blocking_freeze(struct ctdb_context *ctdb);
 void ctdb_set_scheduler(struct ctdb_context *ctdb);
 void ctdb_restore_scheduler(struct ctdb_context *ctdb);
 pid_t ctdb_fork(struct ctdb_context *ctdb);
+pid_t ctdb_fork_no_free_ringbuffer(struct ctdb_context *ctdb);
 int32_t ctdb_control_takeover_ip(struct ctdb_context *ctdb, 
 				 struct ctdb_req_control *c,
 				 TDB_DATA indata, 

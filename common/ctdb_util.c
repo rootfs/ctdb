@@ -361,7 +361,7 @@ void ctdb_restore_scheduler(struct ctdb_context *ctdb)
  * This function forks a child process and drops the realtime 
  * scheduler for the child process.
  */
-pid_t ctdb_fork(struct ctdb_context *ctdb)
+pid_t ctdb_fork_no_free_ringbuffer(struct ctdb_context *ctdb)
 {
 	pid_t pid;
 
@@ -388,11 +388,22 @@ pid_t ctdb_fork(struct ctdb_context *ctdb)
 			ctdb_restore_scheduler(ctdb);
 		}
 		ctdb->can_send_controls = false;
-
-		ctdb_log_ringbuffer_free();
 	}
 	return pid;
 }
+
+pid_t ctdb_fork(struct ctdb_context *ctdb)
+{
+	pid_t pid;
+
+	pid = ctdb_fork_no_free_ringbuffer(ctdb);
+	if (pid == 0) {
+		ctdb_log_ringbuffer_free();
+	}
+
+	return pid;
+}
+
 
 void set_nonblocking(int fd)
 {
