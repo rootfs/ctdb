@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.61
+Version: 1.2.62
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,12 @@ development libraries for ctdb
 
 %changelog
 
+* Mon Apr 22 2013 : Version 1.2.62
+  - Fix a bug where subsequent recoveries can corrupt databases
+  - Fix breakage when freeing log ringbuffer
+  - Add option to create PID file
+  - Check for process existence in service ctdb status instead of ctdb status
+  - Fix ctdb statisticsreset clearing num_clients
 * Fri Apr 05 2013 : Version 1.2.61
   - Free message list header if all message handlers are freed
   - Use tdb_parse_record instead of tdb_fetch to avoid memory leaks
