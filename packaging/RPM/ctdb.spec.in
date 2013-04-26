@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
-Version: 1.0.114.5
+Version: 1.0.114.6
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -127,6 +127,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Mon Apr 29 2013 : Version 1.0.114.6
+ - Michael Adam: fix data corruption bug (by record resurrection) in
+   recovery code (backported from master)
+ - Michael Adam: fix race condition data corruption bug (by record
+   resurrection) in vacuum code (backported from master)
+ - Michael Adam: some typo fixes (backported from master)
+ - Martin Schwenke: Error propagation fix in ctdb_ltdb_store_server()
 * Mon May 07 2012 : Version 1.0.114.5
  - Rusty Russell: wrap iptables in flock to avoid concurrancy
    (backported from master)
