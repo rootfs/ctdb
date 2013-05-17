@@ -117,7 +117,6 @@ static void ctdb_call_send_redirect(struct ctdb_context *ctdb,
 				    struct ctdb_req_call *c, 
 				    struct ctdb_ltdb_header *header)
 {
-	
 	uint32_t lmaster = ctdb_lmaster(ctdb, &key);
 	if (ctdb->pnn == lmaster) {
 		c->hdr.destnode = header->dmaster;
