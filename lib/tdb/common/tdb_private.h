@@ -1,4 +1,6 @@
- /* 
+#ifndef TDB_PRIVATE_H
+#define TDB_PRIVATE_H
+ /*
    Unix SMB/CIFS implementation.
 
    trivial database library - private includes
@@ -59,7 +61,7 @@ typedef uint32_t tdb_off_t;
 #define TDB_DEAD(r) ((r)->magic == TDB_DEAD_MAGIC)
 #define TDB_BAD_MAGIC(r) ((r)->magic != TDB_MAGIC && !TDB_DEAD(r))
 #define TDB_HASH_TOP(hash) (FREELIST_TOP + (BUCKET(hash)+1)*sizeof(tdb_off_t))
-#define TDB_HASHTABLE_SIZE(tdb) ((tdb->header.hash_size+1)*sizeof(tdb_off_t))
+#define TDB_HASHTABLE_SIZE(tdb) ((tdb->hash_size+1)*sizeof(tdb_off_t))
 #define TDB_DATA_START(hash_size) (TDB_HASH_TOP(hash_size-1) + sizeof(tdb_off_t))
 #define TDB_RECOVERY_HEAD offsetof(struct tdb_header, recovery_start)
 #define TDB_SEQNUM_OFS    offsetof(struct tdb_header, sequence_number)
@@ -112,7 +114,7 @@ void tdb_trace_2rec_retrec(struct tdb_context *tdb, const char *op,
 #define SAFE_FREE(x) do { if ((x) != NULL) {free(x); (x)=NULL;} } while(0)
 #endif
 
-#define BUCKET(hash) ((hash) % tdb->header.hash_size)
+#define BUCKET(hash) ((hash) % tdb->hash_size)
 
 #define DOCONV() (tdb->flags & TDB_CONVERT)
 #define CONVERT(x) (DOCONV() ? tdb_convert(&x, sizeof(x)) : &x)
@@ -180,7 +182,7 @@ struct tdb_methods {
 	int (*tdb_read)(struct tdb_context *, tdb_off_t , void *, tdb_len_t , int );
 	int (*tdb_write)(struct tdb_context *, tdb_off_t, const void *, tdb_len_t);
 	void (*next_hash_chain)(struct tdb_context *, uint32_t *);
-	int (*tdb_oob)(struct tdb_context *, tdb_off_t , int );
+	int (*tdb_oob)(struct tdb_context *, tdb_off_t , tdb_len_t, int );
 	int (*tdb_expand_file)(struct tdb_context *, tdb_off_t , tdb_off_t );
 };
 
@@ -196,7 +198,7 @@ struct tdb_context {
 	int num_lockrecs;
 	struct tdb_lock_type *lockrecs; /* only real locks, all with count>0 */
 	enum TDB_ERROR ecode; /* error code for last tdb error */
-	struct tdb_header header; /* a cached copy of the header */
+	uint32_t hash_size;
 	uint32_t flags; /* the flags passed to tdb_open */
 	struct tdb_traverse_lock travlocks; /* current traversal locks */
 	struct tdb_context *next; /* all tdbs to avoid multiple opens */
@@ -220,7 +222,7 @@ struct tdb_context {
   internal prototypes
 */
 int tdb_munmap(struct tdb_context *tdb);
-void tdb_mmap(struct tdb_context *tdb);
+int tdb_mmap(struct tdb_context *tdb);
 int tdb_lock(struct tdb_context *tdb, int list, int ltype);
 int tdb_lock_nonblock(struct tdb_context *tdb, int list, int ltype);
 int tdb_nest_lock(struct tdb_context *tdb, uint32_t offset, int ltype,
@@ -238,6 +240,10 @@ void tdb_release_transaction_locks(struct tdb_context *tdb);
 int tdb_transaction_lock(struct tdb_context *tdb, int ltype,
 			 enum tdb_lock_flags lockflags);
 int tdb_transaction_unlock(struct tdb_context *tdb, int ltype);
+int tdb_recovery_area(struct tdb_context *tdb,
+		      const struct tdb_methods *methods,
+		      tdb_off_t *recovery_offset,
+		      struct tdb_record *rec);
 int tdb_allrecord_lock(struct tdb_context *tdb, int ltype,
 		       enum tdb_lock_flags flags, bool upgradable);
 int tdb_allrecord_unlock(struct tdb_context *tdb, int ltype, bool mark_lock);
@@ -267,6 +273,7 @@ tdb_off_t tdb_find_lock_hash(struct tdb_context *tdb, TDB_DATA key, uint32_t has
 			   struct tdb_record *rec);
 void tdb_io_init(struct tdb_context *tdb);
 int tdb_expand(struct tdb_context *tdb, tdb_off_t size);
+tdb_off_t tdb_expand_adjust(tdb_off_t map_size, tdb_off_t size, int page_size);
 int tdb_rec_free_read(struct tdb_context *tdb, tdb_off_t off,
 		      struct tdb_record *rec);
 bool tdb_write_all(int fd, const void *buf, size_t count);
@@ -274,3 +281,9 @@ int tdb_transaction_recover(struct tdb_context *tdb);
 void tdb_header_hash(struct tdb_context *tdb,
 		     uint32_t *magic1_hash, uint32_t *magic2_hash);
 unsigned int tdb_old_hash(TDB_DATA *key);
+size_t tdb_dead_space(struct tdb_context *tdb, tdb_off_t off);
+bool tdb_add_off_t(tdb_off_t a, tdb_off_t b, tdb_off_t *pret);
+
+/* tdb_off_t and tdb_len_t right now are both uint32_t */
+#define tdb_add_len_t tdb_add_off_t
+#endif /* TDB_PRIVATE_H */

@@ -1,4 +1,4 @@
-/* 
+/*
    Unix SMB/CIFS implementation.
    low level tdb backup and restore utility
    Copyright (C) Andrew Tridgell              2002
@@ -7,12 +7,12 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -61,7 +61,7 @@ static void tdb_log(struct tdb_context *tdb, enum tdb_debug_level level, const c
 static void tdb_log(struct tdb_context *tdb, enum tdb_debug_level level, const char *format, ...)
 {
 	va_list ap;
-    
+
 	va_start(ap, format);
 	vfprintf(stdout, format, ap);
 	va_end(ap);
@@ -122,7 +122,7 @@ static int backup_tdb(const char *old_name, const char *new_name, int hash_size)
 	}
 
 	/* open the old tdb */
-	tdb = tdb_open_ex(old_name, 0, 0, 
+	tdb = tdb_open_ex(old_name, 0, 0,
 			  O_RDWR, 0, &log_ctx, NULL);
 	if (!tdb) {
 		printf("Failed to open %s\n", old_name);
@@ -132,10 +132,10 @@ static int backup_tdb(const char *old_name, const char *new_name, int hash_size)
 
 	/* create the new tdb */
 	unlink(tmp_name);
-	tdb_new = tdb_open_ex(tmp_name, 
-			      hash_size ? hash_size : tdb_hash_size(tdb), 
-			      TDB_DEFAULT, 
-			      O_RDWR|O_CREAT|O_EXCL, st.st_mode & 0777, 
+	tdb_new = tdb_open_ex(tmp_name,
+			      hash_size ? hash_size : tdb_hash_size(tdb),
+			      TDB_DEFAULT,
+			      O_RDWR|O_CREAT|O_EXCL, st.st_mode & 0777,
 			      &log_ctx, NULL);
 	if (!tdb_new) {
 		perror(tmp_name);
@@ -152,8 +152,9 @@ static int backup_tdb(const char *old_name, const char *new_name, int hash_size)
 		return 1;
 	}
 
-	if (tdb_transaction_start(tdb_new) != 0) {
-		printf("Failed to start transaction on new tdb\n");
+	/* lock the backup tdb so that nobody else can change it */
+	if (tdb_lockall(tdb_new) != 0) {
+		printf("Failed to lock backup tdb\n");
 		tdb_close(tdb);
 		tdb_close(tdb_new);
 		unlink(tmp_name);
@@ -177,19 +178,23 @@ static int backup_tdb(const char *old_name, const char *new_name, int hash_size)
 	/* close the old tdb */
 	tdb_close(tdb);
 
-	if (tdb_transaction_commit(tdb_new) != 0) {
-		fprintf(stderr, "Failed to commit new tdb\n");
-		tdb_close(tdb_new);
-		unlink(tmp_name);
-		free(tmp_name);		
-		return 1;
+	/* copy done, unlock the backup tdb */
+	tdb_unlockall(tdb_new);
+
+#ifdef HAVE_FDATASYNC
+	if (fdatasync(tdb_fd(tdb_new)) != 0) {
+#else
+	if (fsync(tdb_fd(tdb_new)) != 0) {
+#endif
+		/* not fatal */
+		fprintf(stderr, "failed to fsync backup file\n");
 	}
 
 	/* close the new tdb and re-open read-only */
 	tdb_close(tdb_new);
-	tdb_new = tdb_open_ex(tmp_name, 
+	tdb_new = tdb_open_ex(tmp_name,
 			      0,
-			      TDB_DEFAULT, 
+			      TDB_DEFAULT,
 			      O_RDONLY, 0,
 			      &log_ctx, NULL);
 	if (!tdb_new) {
@@ -199,7 +204,7 @@ static int backup_tdb(const char *old_name, const char *new_name, int hash_size)
 		free(tmp_name);
 		return 1;
 	}
-	
+
 	/* traverse the new tdb to confirm */
 	count2 = tdb_traverse(tdb_new, test_fn, NULL);
 	if (count2 != count1) {
@@ -232,7 +237,7 @@ static int verify_tdb(const char *fname, const char *bak_name)
 	int count = -1;
 
 	/* open the tdb */
-	tdb = tdb_open_ex(fname, 0, 0, 
+	tdb = tdb_open_ex(fname, 0, 0,
 			  O_RDONLY, 0, &log_ctx, NULL);
 
 	/* traverse the tdb, then close it */
@@ -275,7 +280,6 @@ static void usage(void)
 	printf("   -v            verify mode (restore if corrupt)\n");
 	printf("   -n hashsize   set the new hash size for the backup\n");
 }
-		
 
  int main(int argc, char *argv[])
 {

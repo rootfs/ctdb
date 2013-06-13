@@ -24,7 +24,7 @@ static void _start_timer(void)
 static double _end_timer(void)
 {
 	gettimeofday(&tp2,NULL);
-	return((tp2.tv_sec - tp1.tv_sec) + 
+	return((tp2.tv_sec - tp1.tv_sec) +
 	       (tp2.tv_usec - tp1.tv_usec)*1.0e-6);
 }
 
@@ -40,7 +40,7 @@ static void tdb_log(struct tdb_context *tdb, int level, const char *format, ...)
 static void tdb_log(struct tdb_context *tdb, int level, const char *format, ...)
 {
 	va_list ap;
-    
+
 	va_start(ap, format);
 	vfprintf(stdout, format, ap);
 	va_end(ap);
@@ -189,15 +189,15 @@ static void merge_test(void)
 	char keys[5][2];
 	char tdata[] = "test";
 	TDB_DATA key, data;
-	
+
 	for (i = 0; i < 5; i++) {
 		snprintf(keys[i],2, "%d", i);
 		key.dptr = keys[i];
 		key.dsize = 2;
-		
+
 		data.dptr = tdata;
 		data.dsize = 4;
-		
+
 		if (tdb_store(db, key, data, TDB_REPLACE) != 0) {
 			fatal("tdb_store failed");
 		}
@@ -215,18 +215,40 @@ static void merge_test(void)
 	tdb_delete(db, key);
 }
 
+static char *test_path(const char *filename)
+{
+	const char *prefix = getenv("TEST_DATA_PREFIX");
+
+	if (prefix) {
+		char *path = NULL;
+		int ret;
+
+		ret = asprintf(&path, "%s/%s", prefix, filename);
+		if (ret == -1) {
+			return NULL;
+		}
+		return path;
+	}
+
+	return strdup(filename);
+}
+
  int main(int argc, const char *argv[])
 {
 	int i, seed=0;
 	int loops = 10000;
 	int num_entries;
-	char test_gdbm[] = "test.gdbm";
+	char test_gdbm[1] = "test.gdbm";
+	char *test_tdb;
 
-	unlink("test.gdbm");
+	test_gdbm[0] = test_path("test.gdbm");
+	test_tdb = test_path("test.tdb");
 
-	db = tdb_open("test.tdb", 0, TDB_CLEAR_IF_FIRST, 
+	unlink(test_gdbm[0]);
+
+	db = tdb_open(test_tdb, 0, TDB_CLEAR_IF_FIRST,
 		      O_RDWR | O_CREAT | O_TRUNC, 0600);
-	gdbm = gdbm_open(test_gdbm, 512, GDBM_WRITER|GDBM_NEWDB|GDBM_FAST, 
+	gdbm = gdbm_open(test_gdbm, 512, GDBM_WRITER|GDBM_NEWDB|GDBM_FAST,
 			 0600, NULL);
 
 	if (!db || !gdbm) {
@@ -260,6 +282,9 @@ static void merge_test(void)
 
 	tdb_close(db);
 	gdbm_close(gdbm);
+
+	free(test_gdbm[0]);
+	free(test_tdb);
 
 	return 0;
 }

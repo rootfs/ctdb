@@ -1,4 +1,4 @@
- /* 
+ /*
    Unix SMB/CIFS implementation.
 
    trivial database library
@@ -27,7 +27,7 @@
 
 #include "tdb_private.h"
 
-void tdb_setalarm_sigptr(struct tdb_context *tdb, volatile sig_atomic_t *ptr)
+_PUBLIC_ void tdb_setalarm_sigptr(struct tdb_context *tdb, volatile sig_atomic_t *ptr)
 {
 	tdb->interrupt_sig_ptr = ptr;
 }
@@ -36,6 +36,7 @@ static int fcntl_lock(struct tdb_context *tdb,
 		      int rw, off_t off, off_t len, bool waitflag)
 {
 	struct flock fl;
+	int cmd;
 
 	fl.l_type = rw;
 	fl.l_whence = SEEK_SET;
@@ -43,10 +44,9 @@ static int fcntl_lock(struct tdb_context *tdb,
 	fl.l_len = len;
 	fl.l_pid = 0;
 
-	if (waitflag)
-		return fcntl(tdb->fd, F_SETLKW, &fl);
-	else
-		return fcntl(tdb->fd, F_SETLK, &fl);
+	cmd = waitflag ? F_SETLKW : F_SETLK;
+
+	return fcntl(tdb->fd, cmd, &fl);
 }
 
 static int fcntl_unlock(struct tdb_context *tdb, int rw, off_t off, off_t len)
@@ -126,10 +126,10 @@ static tdb_off_t lock_offset(int list)
 }
 
 /* a byte range locking function - return 0 on success
-   this functions locks/unlocks 1 byte at the specified offset.
+   this functions locks/unlocks "len" byte at the specified offset.
 
    On error, errno is also set so that errors are passed back properly
-   through tdb_open(). 
+   through tdb_open().
 
    note that a len of zero means lock to end of file
 */
@@ -169,8 +169,8 @@ int tdb_brlock(struct tdb_context *tdb,
 		 * EAGAIN is an expected return from non-blocking
 		 * locks. */
 		if (!(flags & TDB_LOCK_PROBE) && errno != EAGAIN) {
-			TDB_LOG((tdb, TDB_DEBUG_TRACE,"tdb_brlock failed (fd=%d) at offset %d rw_type=%d flags=%d len=%d\n",
-				 tdb->fd, offset, rw_type, flags, (int)len));
+			TDB_LOG((tdb, TDB_DEBUG_TRACE,"tdb_brlock failed (fd=%d) at offset %u rw_type=%d flags=%d len=%zu\n",
+				 tdb->fd, offset, rw_type, flags, len));
 		}
 		return -1;
 	}
@@ -191,21 +191,49 @@ int tdb_brunlock(struct tdb_context *tdb,
 	} while (ret == -1 && errno == EINTR);
 
 	if (ret == -1) {
-		TDB_LOG((tdb, TDB_DEBUG_TRACE,"tdb_brunlock failed (fd=%d) at offset %d rw_type=%d len=%d\n",
-			 tdb->fd, offset, rw_type, (int)len));
+		TDB_LOG((tdb, TDB_DEBUG_TRACE,"tdb_brunlock failed (fd=%d) at offset %u rw_type=%u len=%zu\n",
+			 tdb->fd, offset, rw_type, len));
 	}
 	return ret;
 }
 
 /*
-  upgrade a read lock to a write lock. This needs to be handled in a
-  special way as some OSes (such as solaris) have too conservative
-  deadlock detection and claim a deadlock when progress can be
-  made. For those OSes we may loop for a while.  
+ * Do a tdb_brlock in a loop. Some OSes (such as solaris) have too
+ * conservative deadlock detection and claim a deadlock when progress can be
+ * made. For those OSes we may loop for a while.
+ */
+
+static int tdb_brlock_retry(struct tdb_context *tdb,
+			    int rw_type, tdb_off_t offset, size_t len,
+			    enum tdb_lock_flags flags)
+{
+	int count = 1000;
+
+	while (count--) {
+		struct timeval tv;
+		int ret;
+
+		ret = tdb_brlock(tdb, rw_type, offset, len, flags);
+		if (ret == 0) {
+			return 0;
+		}
+		if (errno != EDEADLK) {
+			break;
+		}
+		/* sleep for as short a time as we can - more portable than usleep() */
+		tv.tv_sec = 0;
+		tv.tv_usec = 1;
+		select(0, NULL, NULL, NULL, &tv);
+	}
+	return -1;
+}
+
+/*
+  upgrade a read lock to a write lock.
 */
 int tdb_allrecord_upgrade(struct tdb_context *tdb)
 {
-	int count = 1000;
+	int ret;
 
 	if (tdb->allrecord_lock.count != 1) {
 		TDB_LOG((tdb, TDB_DEBUG_ERROR,
@@ -220,21 +248,12 @@ int tdb_allrecord_upgrade(struct tdb_context *tdb)
 		return -1;
 	}
 
-	while (count--) {
-		struct timeval tv;
-		if (tdb_brlock(tdb, F_WRLCK, FREELIST_TOP, 0,
-			       TDB_LOCK_WAIT|TDB_LOCK_PROBE) == 0) {
-			tdb->allrecord_lock.ltype = F_WRLCK;
-			tdb->allrecord_lock.off = 0;
-			return 0;
-		}
-		if (errno != EDEADLK) {
-			break;
-		}
-		/* sleep for as short a time as we can - more portable than usleep() */
-		tv.tv_sec = 0;
-		tv.tv_usec = 1;
-		select(0, NULL, NULL, NULL, &tv);
+	ret = tdb_brlock_retry(tdb, F_WRLCK, FREELIST_TOP, 0,
+			       TDB_LOCK_WAIT|TDB_LOCK_PROBE);
+	if (ret == 0) {
+		tdb->allrecord_lock.ltype = F_WRLCK;
+		tdb->allrecord_lock.off = 0;
+		return 0;
 	}
 	TDB_LOG((tdb, TDB_DEBUG_TRACE,"tdb_allrecord_upgrade failed\n"));
 	return -1;
@@ -259,7 +278,7 @@ int tdb_nest_lock(struct tdb_context *tdb, uint32_t offset, int ltype,
 {
 	struct tdb_lock_type *new_lck;
 
-	if (offset >= lock_offset(tdb->header.hash_size)) {
+	if (offset >= lock_offset(tdb->hash_size)) {
 		tdb->ecode = TDB_ERR_LOCK;
 		TDB_LOG((tdb, TDB_DEBUG_ERROR,"tdb_lock: invalid offset %u for ltype=%d\n",
 			 offset, ltype));
@@ -334,34 +353,60 @@ static bool have_data_locks(const struct tdb_context *tdb)
 	return false;
 }
 
+/*
+ * A allrecord lock allows us to avoid per chain locks. Check if the allrecord
+ * lock is strong enough.
+ */
+static int tdb_lock_covered_by_allrecord_lock(struct tdb_context *tdb,
+					      int ltype)
+{
+	if (ltype == F_RDLCK) {
+		/*
+		 * The allrecord_lock is equal (F_RDLCK) or stronger
+		 * (F_WRLCK). Pass.
+		 */
+		return 0;
+	}
+
+	if (tdb->allrecord_lock.ltype == F_RDLCK) {
+		/*
+		 * We ask for ltype==F_WRLCK, but the allrecord_lock
+		 * is too weak. We can't upgrade here, so fail.
+		 */
+		tdb->ecode = TDB_ERR_LOCK;
+		return -1;
+	}
+
+	/*
+	 * Asking for F_WRLCK, allrecord is F_WRLCK as well. Pass.
+	 */
+	return 0;
+}
+
 static int tdb_lock_list(struct tdb_context *tdb, int list, int ltype,
 			 enum tdb_lock_flags waitflag)
 {
 	int ret;
 	bool check = false;
 
-	/* a allrecord lock allows us to avoid per chain locks */
-	if (tdb->allrecord_lock.count &&
-	    (ltype == tdb->allrecord_lock.ltype || ltype == F_RDLCK)) {
-		return 0;
+	if (tdb->allrecord_lock.count) {
+		return tdb_lock_covered_by_allrecord_lock(tdb, ltype);
 	}
 
-	if (tdb->allrecord_lock.count) {
-		tdb->ecode = TDB_ERR_LOCK;
-		ret = -1;
-	} else {
-		/* Only check when we grab first data lock. */
-		check = !have_data_locks(tdb);
-		ret = tdb_nest_lock(tdb, lock_offset(list), ltype, waitflag);
+	/*
+	 * Check for recoveries: Someone might have kill -9'ed a process
+	 * during a commit.
+	 */
+	check = !have_data_locks(tdb);
+	ret = tdb_nest_lock(tdb, lock_offset(list), ltype, waitflag);
 
-		if (ret == 0 && check && tdb_needs_recovery(tdb)) {
-			tdb_nest_unlock(tdb, lock_offset(list), ltype, false);
+	if (ret == 0 && check && tdb_needs_recovery(tdb)) {
+		tdb_nest_unlock(tdb, lock_offset(list), ltype, false);
 
-			if (tdb_lock_and_recover(tdb) == -1) {
-				return -1;
-			}
-			return tdb_lock_list(tdb, list, ltype, waitflag);
+		if (tdb_lock_and_recover(tdb) == -1) {
+			return -1;
 		}
+		return tdb_lock_list(tdb, list, ltype, waitflag);
 	}
 	return ret;
 }
@@ -380,7 +425,7 @@ int tdb_lock(struct tdb_context *tdb, int list, int ltype)
 }
 
 /* lock a list in the database. list -1 is the alloc list. non-blocking lock */
-int tdb_lock_nonblock(struct tdb_context *tdb, int list, int ltype)
+_PUBLIC_ int tdb_lock_nonblock(struct tdb_context *tdb, int list, int ltype)
 {
 	return tdb_lock_list(tdb, list, ltype, TDB_LOCK_NOWAIT);
 }
@@ -396,8 +441,8 @@ int tdb_nest_unlock(struct tdb_context *tdb, uint32_t offset, int ltype,
 		return 0;
 
 	/* Sanity checks */
-	if (offset >= lock_offset(tdb->header.hash_size)) {
-		TDB_LOG((tdb, TDB_DEBUG_ERROR, "tdb_unlock: offset %u invalid (%d)\n", offset, tdb->header.hash_size));
+	if (offset >= lock_offset(tdb->hash_size)) {
+		TDB_LOG((tdb, TDB_DEBUG_ERROR, "tdb_unlock: offset %u invalid (%d)\n", offset, tdb->hash_size));
 		return ret;
 	}
 
@@ -441,21 +486,15 @@ int tdb_nest_unlock(struct tdb_context *tdb, uint32_t offset, int ltype,
 	}
 
 	if (ret)
-		TDB_LOG((tdb, TDB_DEBUG_ERROR, "tdb_unlock: An error occurred unlocking!\n")); 
+		TDB_LOG((tdb, TDB_DEBUG_ERROR, "tdb_unlock: An error occurred unlocking!\n"));
 	return ret;
 }
 
-int tdb_unlock(struct tdb_context *tdb, int list, int ltype)
+_PUBLIC_ int tdb_unlock(struct tdb_context *tdb, int list, int ltype)
 {
 	/* a global lock allows us to avoid per chain locks */
-	if (tdb->allrecord_lock.count &&
-	    (ltype == tdb->allrecord_lock.ltype || ltype == F_RDLCK)) {
-		return 0;
-	}
-
 	if (tdb->allrecord_lock.count) {
-		tdb->ecode = TDB_ERR_LOCK;
-		return -1;
+		return tdb_lock_covered_by_allrecord_lock(tdb, ltype);
 	}
 
 	return tdb_nest_unlock(tdb, lock_offset(list), ltype, false);
@@ -562,21 +601,21 @@ int tdb_allrecord_lock(struct tdb_context *tdb, int ltype,
 
 	/* We cover two kinds of locks:
 	 * 1) Normal chain locks.  Taken for almost all operations.
-	 * 3) Individual records locks.  Taken after normal or free
+	 * 2) Individual records locks.  Taken after normal or free
 	 *    chain locks.
 	 *
 	 * It is (1) which cause the starvation problem, so we're only
 	 * gradual for that. */
 	if (tdb_chainlock_gradual(tdb, ltype, flags, FREELIST_TOP,
-				  tdb->header.hash_size * 4) == -1) {
+				  tdb->hash_size * 4) == -1) {
 		return -1;
 	}
 
 	/* Grab individual record locks. */
-	if (tdb_brlock(tdb, ltype, lock_offset(tdb->header.hash_size), 0,
+	if (tdb_brlock(tdb, ltype, lock_offset(tdb->hash_size), 0,
 		       flags) == -1) {
 		tdb_brunlock(tdb, ltype, FREELIST_TOP,
-			     tdb->header.hash_size * 4);
+			     tdb->hash_size * 4);
 		return -1;
 	}
 
@@ -644,28 +683,28 @@ int tdb_allrecord_unlock(struct tdb_context *tdb, int ltype, bool mark_lock)
 }
 
 /* lock entire database with write lock */
-int tdb_lockall(struct tdb_context *tdb)
+_PUBLIC_ int tdb_lockall(struct tdb_context *tdb)
 {
 	tdb_trace(tdb, "tdb_lockall");
 	return tdb_allrecord_lock(tdb, F_WRLCK, TDB_LOCK_WAIT, false);
 }
 
 /* lock entire database with write lock - mark only */
-int tdb_lockall_mark(struct tdb_context *tdb)
+_PUBLIC_ int tdb_lockall_mark(struct tdb_context *tdb)
 {
 	tdb_trace(tdb, "tdb_lockall_mark");
 	return tdb_allrecord_lock(tdb, F_WRLCK, TDB_LOCK_MARK_ONLY, false);
 }
 
 /* unlock entire database with write lock - unmark only */
-int tdb_lockall_unmark(struct tdb_context *tdb)
+_PUBLIC_ int tdb_lockall_unmark(struct tdb_context *tdb)
 {
 	tdb_trace(tdb, "tdb_lockall_unmark");
 	return tdb_allrecord_unlock(tdb, F_WRLCK, true);
 }
 
 /* lock entire database with write lock - nonblocking varient */
-int tdb_lockall_nonblock(struct tdb_context *tdb)
+_PUBLIC_ int tdb_lockall_nonblock(struct tdb_context *tdb)
 {
 	int ret = tdb_allrecord_lock(tdb, F_WRLCK, TDB_LOCK_NOWAIT, false);
 	tdb_trace_ret(tdb, "tdb_lockall_nonblock", ret);
@@ -673,21 +712,21 @@ int tdb_lockall_nonblock(struct tdb_context *tdb)
 }
 
 /* unlock entire database with write lock */
-int tdb_unlockall(struct tdb_context *tdb)
+_PUBLIC_ int tdb_unlockall(struct tdb_context *tdb)
 {
 	tdb_trace(tdb, "tdb_unlockall");
 	return tdb_allrecord_unlock(tdb, F_WRLCK, false);
 }
 
 /* lock entire database with read lock */
-int tdb_lockall_read(struct tdb_context *tdb)
+_PUBLIC_ int tdb_lockall_read(struct tdb_context *tdb)
 {
 	tdb_trace(tdb, "tdb_lockall_read");
 	return tdb_allrecord_lock(tdb, F_RDLCK, TDB_LOCK_WAIT, false);
 }
 
 /* lock entire database with read lock - nonblock varient */
-int tdb_lockall_read_nonblock(struct tdb_context *tdb)
+_PUBLIC_ int tdb_lockall_read_nonblock(struct tdb_context *tdb)
 {
 	int ret = tdb_allrecord_lock(tdb, F_RDLCK, TDB_LOCK_NOWAIT, false);
 	tdb_trace_ret(tdb, "tdb_lockall_read_nonblock", ret);
@@ -695,7 +734,7 @@ int tdb_lockall_read_nonblock(struct tdb_context *tdb)
 }
 
 /* unlock entire database with read lock */
-int tdb_unlockall_read(struct tdb_context *tdb)
+_PUBLIC_ int tdb_unlockall_read(struct tdb_context *tdb)
 {
 	tdb_trace(tdb, "tdb_unlockall_read");
 	return tdb_allrecord_unlock(tdb, F_RDLCK, false);
@@ -703,7 +742,7 @@ int tdb_unlockall_read(struct tdb_context *tdb)
 
 /* lock/unlock one hash chain. This is meant to be used to reduce
    contention - it cannot guarantee how many records will be locked */
-int tdb_chainlock(struct tdb_context *tdb, TDB_DATA key)
+_PUBLIC_ int tdb_chainlock(struct tdb_context *tdb, TDB_DATA key)
 {
 	int ret = tdb_lock(tdb, BUCKET(tdb->hash_fn(&key)), F_WRLCK);
 	tdb_trace_1rec(tdb, "tdb_chainlock", key);
@@ -713,7 +752,7 @@ int tdb_chainlock(struct tdb_context *tdb, TDB_DATA key)
 /* lock/unlock one hash chain, non-blocking. This is meant to be used
    to reduce contention - it cannot guarantee how many records will be
    locked */
-int tdb_chainlock_nonblock(struct tdb_context *tdb, TDB_DATA key)
+_PUBLIC_ int tdb_chainlock_nonblock(struct tdb_context *tdb, TDB_DATA key)
 {
 	int ret = tdb_lock_nonblock(tdb, BUCKET(tdb->hash_fn(&key)), F_WRLCK);
 	tdb_trace_1rec_ret(tdb, "tdb_chainlock_nonblock", key, ret);
@@ -721,7 +760,7 @@ int tdb_chainlock_nonblock(struct tdb_context *tdb, TDB_DATA key)
 }
 
 /* mark a chain as locked without actually locking it. Warning! use with great caution! */
-int tdb_chainlock_mark(struct tdb_context *tdb, TDB_DATA key)
+_PUBLIC_ int tdb_chainlock_mark(struct tdb_context *tdb, TDB_DATA key)
 {
 	int ret = tdb_nest_lock(tdb, lock_offset(BUCKET(tdb->hash_fn(&key))),
 				F_WRLCK, TDB_LOCK_MARK_ONLY);
@@ -730,20 +769,20 @@ int tdb_chainlock_mark(struct tdb_context *tdb, TDB_DATA key)
 }
 
 /* unmark a chain as locked without actually locking it. Warning! use with great caution! */
-int tdb_chainlock_unmark(struct tdb_context *tdb, TDB_DATA key)
+_PUBLIC_ int tdb_chainlock_unmark(struct tdb_context *tdb, TDB_DATA key)
 {
 	tdb_trace_1rec(tdb, "tdb_chainlock_unmark", key);
 	return tdb_nest_unlock(tdb, lock_offset(BUCKET(tdb->hash_fn(&key))),
 			       F_WRLCK, true);
 }
 
-int tdb_chainunlock(struct tdb_context *tdb, TDB_DATA key)
+_PUBLIC_ int tdb_chainunlock(struct tdb_context *tdb, TDB_DATA key)
 {
 	tdb_trace_1rec(tdb, "tdb_chainunlock", key);
 	return tdb_unlock(tdb, BUCKET(tdb->hash_fn(&key)), F_WRLCK);
 }
 
-int tdb_chainlock_read(struct tdb_context *tdb, TDB_DATA key)
+_PUBLIC_ int tdb_chainlock_read(struct tdb_context *tdb, TDB_DATA key)
 {
 	int ret;
 	ret = tdb_lock(tdb, BUCKET(tdb->hash_fn(&key)), F_RDLCK);
@@ -751,13 +790,11 @@ int tdb_chainlock_read(struct tdb_context *tdb, TDB_DATA key)
 	return ret;
 }
 
-int tdb_chainunlock_read(struct tdb_context *tdb, TDB_DATA key)
+_PUBLIC_ int tdb_chainunlock_read(struct tdb_context *tdb, TDB_DATA key)
 {
 	tdb_trace_1rec(tdb, "tdb_chainunlock_read", key);
 	return tdb_unlock(tdb, BUCKET(tdb->hash_fn(&key)), F_RDLCK);
 }
-
-
 
 /* record lock stops delete underneath */
 int tdb_lock_record(struct tdb_context *tdb, tdb_off_t off)
@@ -842,7 +879,7 @@ void tdb_release_transaction_locks(struct tdb_context *tdb)
 	unsigned int i, active = 0;
 
 	if (tdb->allrecord_lock.count != 0) {
-		tdb_brunlock(tdb, tdb->allrecord_lock.ltype, FREELIST_TOP, 0);
+		tdb_allrecord_unlock(tdb, tdb->allrecord_lock.ltype, false);
 		tdb->allrecord_lock.count = 0;
 	}
 
@@ -862,22 +899,18 @@ void tdb_release_transaction_locks(struct tdb_context *tdb)
 	}
 }
 
-int tdb_transaction_write_lock_mark(struct tdb_context *tdb)
+/* Following functions are added specifically to support CTDB. */
+
+/* Don't do actual fcntl locking, just mark tdb locked */
+int tdb_transaction_write_lock_mark(struct tdb_context *tdb);
+_PUBLIC_ int tdb_transaction_write_lock_mark(struct tdb_context *tdb)
 {
 	return tdb_transaction_lock(tdb, F_WRLCK, TDB_LOCK_MARK_ONLY);
 }
 
-int tdb_transaction_write_lock(struct tdb_context *tdb)
-{
-	return tdb_transaction_lock(tdb, F_WRLCK, 0);
-}
-
-int tdb_transaction_write_unlock(struct tdb_context *tdb)
-{
-	return tdb_transaction_unlock(tdb, F_WRLCK);
-}
-
-int tdb_transaction_write_lock_unmark(struct tdb_context *tdb)
+/* Don't do actual fcntl unlocking, just mark tdb unlocked */
+int tdb_transaction_write_lock_unmark(struct tdb_context *tdb);
+_PUBLIC_ int tdb_transaction_write_lock_unmark(struct tdb_context *tdb)
 {
 	return tdb_nest_unlock(tdb, TRANSACTION_LOCK, F_WRLCK, true);
 }
