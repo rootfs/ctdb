@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.62
+Version: 1.2.63
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,8 @@ development libraries for ctdb
 
 %changelog
 
+* Mon Jun 17 2013 : Version 1.2.63
+  - Sync tdb library version to 1.2.12
 * Mon Apr 22 2013 : Version 1.2.62
   - Fix a bug where subsequent recoveries can corrupt databases
   - Fix breakage when freeing log ringbuffer
