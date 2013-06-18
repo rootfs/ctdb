@@ -1674,7 +1674,8 @@ again:
 	/* get the number of nodes and node flags */
 	if (ctdb_ctrl_getnodemap(ctdb, TIMELIMIT(), options.pnn, ctdb, &nodemap) != 0) {
 		DEBUG(DEBUG_ERR, ("Unable to get nodemap from local node\n"));
-		return -1;
+		sleep(1);
+		goto again;
 	}
 
 	ipreallocate_finished = false;
@@ -2532,10 +2533,9 @@ static int control_stop(struct ctdb_context *ctdb, int argc, const char **argv)
 		/* read the nodemap and verify the change took effect */
 		if (ctdb_ctrl_getnodemap(ctdb, TIMELIMIT(), CTDB_CURRENT_NODE, ctdb, &nodemap) != 0) {
 			DEBUG(DEBUG_ERR, ("Unable to get nodemap from local node\n"));
-			exit(10);
 		}
 
-	} while (!(nodemap->nodes[options.pnn].flags & NODE_FLAGS_STOPPED));
+	} while (nodemap == NULL || !(nodemap->nodes[options.pnn].flags & NODE_FLAGS_STOPPED));
 	ret = control_ipreallocate(ctdb, argc, argv);
 	if (ret != 0) {
 		DEBUG(DEBUG_ERR, ("IP Reallocate failed on node %u\n", options.pnn));
@@ -2566,10 +2566,9 @@ static int control_continue(struct ctdb_context *ctdb, int argc, const char **ar
 		/* read the nodemap and verify the change took effect */
 		if (ctdb_ctrl_getnodemap(ctdb, TIMELIMIT(), CTDB_CURRENT_NODE, ctdb, &nodemap) != 0) {
 			DEBUG(DEBUG_ERR, ("Unable to get nodemap from local node\n"));
-			exit(10);
 		}
 
-	} while (nodemap->nodes[options.pnn].flags & NODE_FLAGS_STOPPED);
+	} while (nodemap == NULL || nodemap->nodes[options.pnn].flags & NODE_FLAGS_STOPPED);
 	ret = control_ipreallocate(ctdb, argc, argv);
 	if (ret != 0) {
 		DEBUG(DEBUG_ERR, ("IP Reallocate failed on node %u\n", options.pnn));
