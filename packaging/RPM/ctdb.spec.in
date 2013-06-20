@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.63
+Version: 1.2.64
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,10 @@ development libraries for ctdb
 
 %changelog
 
+* Thu Jun 20 2013 : Version 1.2.64
+  - Add configuration variables to maintain configured number of NFS threads
+  - Fix racy code in CTDB commandline tool for ipreallocate/sync
+  - Fix printing of node flags
 * Mon Jun 17 2013 : Version 1.2.63
   - Sync tdb library version to 1.2.12
 * Mon Apr 22 2013 : Version 1.2.62
