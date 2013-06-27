@@ -2990,7 +2990,7 @@ static void main_loop(struct ctdb_context *ctdb, struct ctdb_recoverd *rec,
 	/* if the local daemon is STOPPED or BANNED, we verify that the databases are
 	   also frozen and thet the recmode is set to active.
 	*/
-	if (nodemap->nodes[pnn].flags & (NODE_FLAGS_STOPPED | NODE_FLAGS_BANNED)) {
+	if (rec->node_flags & (NODE_FLAGS_STOPPED | NODE_FLAGS_BANNED)) {
 		ret = ctdb_ctrl_getrecmode(ctdb, mem_ctx, CONTROL_TIMEOUT(), CTDB_CURRENT_NODE, &ctdb->recovery_mode);
 		if (ret != 0) {
 			DEBUG(DEBUG_ERR,(__location__ " Failed to read recmode from local node\n"));
@@ -3009,9 +3009,15 @@ static void main_loop(struct ctdb_context *ctdb, struct ctdb_recoverd *rec,
 
 				return;
 			}
-			return;
 		}
+
+		/* If this node is stopped or banned then it is not the recovery
+		 * master, so don't do anything. This prevents stopped or banned
+		 * node from starting election and sending unnecessary controls.
+		 */
+		return;
 	}
+
 	/* If the local node is stopped, verify we are not the recmaster 
 	   and yield this role if so
 	*/
@@ -3082,15 +3088,6 @@ static void main_loop(struct ctdb_context *ctdb, struct ctdb_recoverd *rec,
 	if (recmaster_nodemap->nodes[j].flags & NODE_FLAGS_INACTIVE) {
 		DEBUG(DEBUG_NOTICE, ("Recmaster node %u no longer available. Force reelection\n", nodemap->nodes[j].pnn));
 		force_election(rec, pnn, nodemap);
-		return;
-	}
-
-	/* If this node is stopped then it is not the recovery master
-	 * so the only remaining action is to potentially to verify
-	 * the local IP allocation below.  This won't accomplish
-	 * anything useful so skip it.
-	 */
-	if (rec->node_flags & NODE_FLAGS_STOPPED) {
 		return;
 	}
 
