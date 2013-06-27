@@ -3272,15 +3272,6 @@ static void main_loop(struct ctdb_context *ctdb, struct ctdb_recoverd *rec,
 		return;
 	}
 
-	/* If the local node is stopped, verify we are not the recmaster 
-	   and yield this role if so
-	*/
-	if ((nodemap->nodes[pnn].flags & NODE_FLAGS_STOPPED) && (rec->recmaster == pnn)) {
-		DEBUG(DEBUG_ERR,("Local node is STOPPED. Yielding recmaster role\n"));
-		force_election(rec, pnn, nodemap);
-		return;
-	}
-	
 	/*
 	 * if the current recmaster do not have CTDB_CAP_RECMASTER,
 	 * but we have force an election and try to become the new
