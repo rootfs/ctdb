@@ -252,14 +252,9 @@ static int ctdb_freeze_waiter_destructor(struct ctdb_freeze_waiter *w)
  */
 int ctdb_start_freeze(struct ctdb_context *ctdb, uint32_t priority)
 {
-	if (priority == 0) {
-		DEBUG(DEBUG_ERR,("Freeze priority 0 requested, remapping to priority 1\n"));
-		priority = 1;
-	}
-
 	if ((priority < 1) || (priority > NUM_DB_PRIORITIES)) {
 		DEBUG(DEBUG_ERR,(__location__ " Invalid db priority : %u\n", priority));
-		return -1;
+		ctdb_fatal(ctdb, "Internal error");
 	}
 
 	if (ctdb->freeze_mode[priority] == CTDB_FREEZE_FROZEN) {
