@@ -250,7 +250,7 @@ static int ctdb_freeze_waiter_destructor(struct ctdb_freeze_waiter *w)
 /*
   start the freeze process for a certain priority
  */
-int ctdb_start_freeze(struct ctdb_context *ctdb, uint32_t priority)
+void ctdb_start_freeze(struct ctdb_context *ctdb, uint32_t priority)
 {
 	if ((priority < 1) || (priority > NUM_DB_PRIORITIES)) {
 		DEBUG(DEBUG_ERR,(__location__ " Invalid db priority : %u\n", priority));
@@ -259,7 +259,7 @@ int ctdb_start_freeze(struct ctdb_context *ctdb, uint32_t priority)
 
 	if (ctdb->freeze_mode[priority] == CTDB_FREEZE_FROZEN) {
 		/* we're already frozen */
-		return 0;
+		return;
 	}
 
 	DEBUG(DEBUG_ERR, ("Freeze priority %u\n", priority));
@@ -270,11 +270,9 @@ int ctdb_start_freeze(struct ctdb_context *ctdb, uint32_t priority)
 	/* if there isn't a freeze lock child then create one */
 	if (ctdb->freeze_handles[priority] == NULL) {
 		ctdb->freeze_handles[priority] = ctdb_freeze_lock(ctdb, priority);
-		CTDB_NO_MEMORY(ctdb, ctdb->freeze_handles[priority]);
+		CTDB_NO_MEMORY_FATAL(ctdb, ctdb->freeze_handles[priority]);
 		ctdb->freeze_mode[priority] = CTDB_FREEZE_PENDING;
 	}
-
-	return 0;
 }
 
 /*
@@ -303,10 +301,7 @@ int32_t ctdb_control_freeze(struct ctdb_context *ctdb, struct ctdb_req_control *
 		return 0;
 	}
 
-	if (ctdb_start_freeze(ctdb, priority) != 0) {
-		DEBUG(DEBUG_ERR,(__location__ " Failed to start freezing databases with priority %u\n", priority));
-		return -1;
-	}
+	ctdb_start_freeze(ctdb, priority);
 
 	/* add ourselves to list of waiters */
 	if (ctdb->freeze_handles[priority] == NULL) {
@@ -337,10 +332,7 @@ bool ctdb_blocking_freeze(struct ctdb_context *ctdb)
 	int i;
 
 	for (i=1; i<=NUM_DB_PRIORITIES; i++) {
-		if (ctdb_start_freeze(ctdb, i)) {
-			DEBUG(DEBUG_ERR,(__location__ " Failed to freeze databases of prio %u\n", i));
-			continue;
-		}
+		ctdb_start_freeze(ctdb, i);
 
 		/* block until frozen */
 		while (ctdb->freeze_mode[i] == CTDB_FREEZE_PENDING) {
