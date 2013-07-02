@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.64
+Version: 1.2.65
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,11 @@ development libraries for ctdb
 
 %changelog
 
+* Tue Jul 02 2013 : Version 1.2.65
+  - Fix the flags passed in modify flags control from recovery daemon
+  - Do early return from recoverd main loop if node is inactive
+  - Don't let inactive node apply banning credits on other nodes
+  - If recmaster node is inactive, don't include it in election
 * Thu Jun 20 2013 : Version 1.2.64
   - Add configuration variables to maintain configured number of NFS threads
   - Fix racy code in CTDB commandline tool for ipreallocate/sync
