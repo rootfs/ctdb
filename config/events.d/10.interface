@@ -38,6 +38,9 @@ monitor_interfaces()
 	for IFACE in $INTERFACES ; do
 
 	    ip addr show $IFACE 2>/dev/null >/dev/null || {
+		echo "ERROR: Interface $IFACE does not exist but is used by public addresses"
+		fail=1
+		ctdb setifacelink $IFACE down >/dev/null 2>/dev/null
 		continue
 	    }
 
