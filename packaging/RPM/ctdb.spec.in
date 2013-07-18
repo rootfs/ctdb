@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.65
+Version: 1.2.66
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,8 @@ development libraries for ctdb
 
 %changelog
 
+* Thu Jul 18 2013 : Version 1.2.66
+  - A missing interface should cause monitoring to fail
 * Tue Jul 02 2013 : Version 1.2.65
   - Fix the flags passed in modify flags control from recovery daemon
   - Do early return from recoverd main loop if node is inactive
