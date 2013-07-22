@@ -1987,6 +1987,40 @@ finished:
 	return;
 }
 
+struct takeover_callback_data {
+	bool *node_failed;
+	client_async_callback fail_callback;
+	void *fail_callback_data;
+	struct ctdb_node_map *nodemap;
+};
+
+static void takeover_run_fail_callback(struct ctdb_context *ctdb,
+				       uint32_t node_pnn, int32_t res,
+				       TDB_DATA outdata, void *callback_data)
+{
+	struct takeover_callback_data *cd =
+		talloc_get_type_abort(callback_data,
+				      struct takeover_callback_data);
+	int i;
+
+	for (i = 0; i < cd->nodemap->num; i++) {
+		if (node_pnn == cd->nodemap->nodes[i].pnn) {
+			break;
+		}
+	}
+
+	if (i == cd->nodemap->num) {
+		DEBUG(DEBUG_ERR, (__location__ " invalid PNN %u\n", node_pnn));
+		return;
+	}
+
+	if (!cd->node_failed[i]) {
+		cd->node_failed[i] = true;
+		cd->fail_callback(ctdb, node_pnn, res, outdata,
+				  cd->fail_callback_data);
+	}
+}
+
 /*
   make any IP alias changes for public addresses that are necessary 
  */
@@ -2003,6 +2037,7 @@ int ctdb_takeover_run(struct ctdb_context *ctdb, struct ctdb_node_map *nodemap,
 	struct client_async_data *async_data;
 	struct ctdb_client_control_state *state;
 	TALLOC_CTX *tmp_ctx = talloc_new(ctdb);
+	struct takeover_callback_data *takeover_data;
 
 	/*
 	 * ip failover is completely disabled, just send out the 
@@ -2020,11 +2055,21 @@ int ctdb_takeover_run(struct ctdb_context *ctdb, struct ctdb_node_map *nodemap,
 	/* now tell all nodes to delete any alias that they should not
 	   have.  This will be a NOOP on nodes that don't currently
 	   hold the given alias */
+	takeover_data = talloc_zero(tmp_ctx, struct takeover_callback_data);
+	CTDB_NO_MEMORY_FATAL(ctdb, takeover_data);
+
+	takeover_data->node_failed = talloc_zero_array(tmp_ctx,
+						       bool, nodemap->num);
+	CTDB_NO_MEMORY_FATAL(ctdb, takeover_data->node_failed);
+	takeover_data->fail_callback = fail_callback;
+	takeover_data->fail_callback_data = callback_data;
+	takeover_data->nodemap = nodemap;
+
 	async_data = talloc_zero(tmp_ctx, struct client_async_data);
 	CTDB_NO_MEMORY_FATAL(ctdb, async_data);
 
-	async_data->fail_callback = fail_callback;
-	async_data->callback_data = callback_data;
+	async_data->fail_callback = takeover_run_fail_callback;
+	async_data->callback_data = takeover_data;
 
 	for (i=0;i<nodemap->num;i++) {
 		/* don't talk to unconnected nodes, but do talk to banned nodes */
