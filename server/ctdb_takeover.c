@@ -2186,8 +2186,7 @@ ipreallocated:
 	 */
 	data.dptr  = discard_const("ipreallocated");
 	data.dsize = strlen((char *)data.dptr) + 1; 
-	nodes = list_of_nodes(ctdb, nodemap, tmp_ctx,
-			      NODE_FLAGS_DISCONNECTED|NODE_FLAGS_STOPPED, -1);
+	nodes = list_of_nodes(ctdb, nodemap, tmp_ctx, NODE_FLAGS_INACTIVE, -1);
 	if (ctdb_client_async_control(ctdb, CTDB_CONTROL_RUN_EVENTSCRIPTS,
 				      nodes, 0, TAKEOVER_TIMEOUT(),
 				      false, data,
