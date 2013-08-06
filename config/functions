@@ -759,16 +759,17 @@ setup_iface_ip_readd_script()
 # ctdb_check_counter_limit succeeds when count >= <limit>
 ########################################################
 _ctdb_counter_common () {
-    _counter_file="$ctdb_fail_dir/$service_name"
+    _service_name="${1:-${service_name}}"
+    _counter_file="$ctdb_fail_dir/$_service_name"
     mkdir -p "${_counter_file%/*}" # dirname
 }
 ctdb_counter_init () {
-    _ctdb_counter_common
+    _ctdb_counter_common "$1"
 
     >"$_counter_file"
 }
 ctdb_counter_incr () {
-    _ctdb_counter_common
+    _ctdb_counter_common "$1"
 
     # unary counting!
     echo -n 1 >> "$_counter_file"
@@ -782,10 +783,10 @@ ctdb_check_counter_limit () {
     # unary counting!
     _size=$(stat -c "%s" "$_counter_file" 2>/dev/null || echo 0)
     if [ $_size -ge $_limit ] ; then
-	echo "ERROR: more than $_limit consecutive failures for $service_name, marking cluster unhealthy"
+	echo "ERROR: more than $_limit consecutive failures for $_service_name, marking cluster unhealthy"
 	exit 1
     elif [ $_size -gt 0 -a -z "$_quiet" ] ; then
-	echo "WARNING: less than $_limit consecutive failures ($_size) for $service_name, not unhealthy yet"
+	echo "WARNING: less than $_limit consecutive failures ($_size) for $_service_name, not unhealthy yet"
     fi
 }
 ctdb_check_counter_equal () {
