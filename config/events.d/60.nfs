@@ -70,11 +70,6 @@ case "$1" in
 	;;
 
       monitor)
-	if ctdb_service_needs_reconfigure ; then
-	    ctdb_service_reconfigure
-	    exit 0
-	fi
-
 	update_tickles 2049
 
 	# check that statd responds to rpc requests
@@ -201,6 +196,11 @@ case "$1" in
        	;;
 
     ipreallocated)
+	if ctdb_service_needs_reconfigure ; then
+	    ctdb_service_reconfigure
+	    exit 0
+	fi
+
 	# if the ips have been reallocated, we must restart the lockmanager
 	# across all nodes and ping all statd listeners
 	[ -x $CTDB_BASE/statd-callout ] && {
