@@ -5281,7 +5281,7 @@ int main(int argc, const char *argv[])
 	
 	/* set some defaults */
 	options.maxruntime = 0;
-	options.timelimit = 3;
+	options.timelimit = 10;
 	options.pnn = CTDB_CURRENT_NODE;
 
 	pc = poptGetContext(argv[0], argc, argv, popt_options, POPT_CONTEXT_KEEP_FIRST);
