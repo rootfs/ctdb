@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.66
+Version: 1.2.67
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,14 @@ development libraries for ctdb
 
 %changelog
 
+* Wed Aug 14 2013 : Version 1.2.67
+  - When takeover fails, call fail callback only once and not once per IP
+  - Do not send ipreallocated event to banned nodes
+  - If rpc check fails for nfs, mark node unhealthy after 2 failures
+    and restart after every 10 failures
+  - Make ctdb ban/unban more resilient to individual control timeouts
+  - Make sure that volatile databases are always used with jenkins hash
+  - Increase the default control timeout in ctdb tool from 3s to 10s
 * Thu Jul 18 2013 : Version 1.2.66
   - A missing interface should cause monitoring to fail
 * Tue Jul 02 2013 : Version 1.2.65
