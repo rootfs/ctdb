@@ -2649,11 +2649,22 @@ static int control_ban(struct ctdb_context *ctdb, int argc, const char **argv)
 	bantime.pnn  = options.pnn;
 	bantime.time = strtoul(argv[0], NULL, 0);
 
-	ret = ctdb_ctrl_set_ban(ctdb, TIMELIMIT(), options.pnn, &bantime);
-	if (ret != 0) {
-		DEBUG(DEBUG_ERR,("Banning node %d for %d seconds failed.\n", bantime.pnn, bantime.time));
-		return -1;
-	}	
+	do {
+		ret = ctdb_ctrl_set_ban(ctdb, TIMELIMIT(), options.pnn, &bantime);
+		if (ret != 0) {
+			DEBUG(DEBUG_WARNING, ("Unable to ban node %u for %d seconds\n",
+					      bantime.pnn, bantime.time));
+		}
+
+		sleep(1);
+
+		/* read the nodemap and verify the change took effect */
+		if (ctdb_ctrl_getnodemap(ctdb, TIMELIMIT(), CTDB_CURRENT_NODE, ctdb, &nodemap) != 0) {
+			DEBUG(DEBUG_WARNING, ("Unable to get nodemap from local node\n"));
+			nodemap = NULL;
+		}
+
+	} while (nodemap == NULL || !(nodemap->nodes[options.pnn].flags & NODE_FLAGS_BANNED));
 
 	ret = control_ipreallocate(ctdb, argc, argv);
 	if (ret != 0) {
@@ -2689,11 +2700,21 @@ static int control_unban(struct ctdb_context *ctdb, int argc, const char **argv)
 	bantime.pnn  = options.pnn;
 	bantime.time = 0;
 
-	ret = ctdb_ctrl_set_ban(ctdb, TIMELIMIT(), options.pnn, &bantime);
-	if (ret != 0) {
-		DEBUG(DEBUG_ERR,("Unbanning node %d failed.\n", bantime.pnn));
-		return -1;
-	}	
+	do {
+		ret = ctdb_ctrl_set_ban(ctdb, TIMELIMIT(), options.pnn, &bantime);
+		if (ret != 0) {
+			DEBUG(DEBUG_WARNING, ("Unable to unban node %u\n", bantime.pnn));
+		}
+
+		sleep(1);
+
+		/* read the nodemap and verify the change took effect */
+		if (ctdb_ctrl_getnodemap(ctdb, TIMELIMIT(), CTDB_CURRENT_NODE, ctdb, &nodemap) != 0) {
+			DEBUG(DEBUG_WARNING, ("Unable to get nodemap from local node\n"));
+			nodemap = NULL;
+		}
+
+	} while (nodemap == NULL || (nodemap->nodes[options.pnn].flags & NODE_FLAGS_BANNED));
 
 	ret = control_ipreallocate(ctdb, argc, argv);
 	if (ret != 0) {
