@@ -4,7 +4,7 @@ Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
 Name: ctdb
-Version: 1.0.114.6
+Version: 1.0.114.7
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -127,6 +127,17 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/ctdb/tests/bin/ctdb_transaction
 
 %changelog
+* Wed Sep 04 2013 : Version 1.0.114.7
+ - Amitay Isaacs, Martin Schwenke, Michael Adam: banning robustness fixes.
+ - Amitay Isaacs: Fix record bouncing bug introduced by 3-phase vacuuming.
+ - Ronnie Sahlberg: make public ip assignments more consistent.
+ - Sumit Bose: fix FD leak in epoll event code.
+ - Sumit Bose: let ctdb status also print deleted nodes.
+ - Sumit Bose: IPv6 neighbor solicit cleanup.
+ - Sumit Bose: Fix memory leak in client code.
+ - Sumit Bose, Volker Lendecke: fix various Coverity issues.
+ - Ronnie Sahlberg: Fix NULL pointer dereference in the recovery code.
+ - Rusty Russell: fix crash on large ids on AIX.
 * Mon Apr 29 2013 : Version 1.0.114.6
  - Michael Adam: fix data corruption bug (by record resurrection) in
    recovery code (backported from master)
