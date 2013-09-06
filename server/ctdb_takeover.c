@@ -1556,11 +1556,12 @@ void lcp2_init(struct ctdb_context * tmp_ctx,
 	while (force_rebalance_list != NULL) {
 		struct ctdb_rebalancenodes *next = force_rebalance_list->next;
 
-		if (force_rebalance_list->pnn <= nodemap->num) {
+		if (force_rebalance_list->pnn <= nodemap->num &&
+		    !(nodemap->nodes[force_rebalance_list->pnn].flags & mask)) {
 			(*newly_healthy)[force_rebalance_list->pnn] = true;
+			DEBUG(DEBUG_ERR,("During ipreallocation, forced rebalance of node %d\n", force_rebalance_list->pnn));
 		}
 
-		DEBUG(DEBUG_ERR,("During ipreallocation, forced rebalance of node %d\n", force_rebalance_list->pnn));
 		talloc_free(force_rebalance_list);
 		force_rebalance_list = next;
 	}
