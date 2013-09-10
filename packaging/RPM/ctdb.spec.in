@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.67
+Version: 1.2.68
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,9 @@ development libraries for ctdb
 
 %changelog
 
+* Tue Sep 10 2013 : Version 1.2.68
+  - Use fixed size queue buffers for fair scheduling across tevent FDs
+  - Nodes to be used as forced rebalance targets must be healthy
 * Wed Aug 14 2013 : Version 1.2.67
   - When takeover fails, call fail callback only once and not once per IP
   - Do not send ipreallocated event to banned nodes
