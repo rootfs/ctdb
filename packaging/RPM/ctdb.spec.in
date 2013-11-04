@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.68
+Version: 1.2.69
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,8 @@ development libraries for ctdb
 
 %changelog
 
+* Mon Nov 04 2013 : Version 1.2.69
+  - Nodes should always update recovery master during an election
 * Tue Sep 10 2013 : Version 1.2.68
   - Use fixed size queue buffers for fair scheduling across tevent FDs
   - Nodes to be used as forced rebalance targets must be healthy
