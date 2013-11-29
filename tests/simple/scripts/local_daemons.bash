@@ -128,3 +128,9 @@ maybe_stop_ctdb ()
 	daemons_stop
     fi
 }
+
+_restart_ctdb_all ()
+{
+    daemons_stop
+    daemons_start "$@"
+}
