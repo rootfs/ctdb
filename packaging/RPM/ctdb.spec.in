@@ -3,7 +3,7 @@ Name: ctdb
 Summary: Clustered TDB
 Vendor: Samba Team
 Packager: Samba Team <samba@samba.org>
-Version: 1.2.70
+Version: 1.2.71
 Release: 1GITHASH
 Epoch: 0
 License: GNU GPL version 3
@@ -155,6 +155,8 @@ development libraries for ctdb
 
 %changelog
 
+* Mon Dec 09 2013 : Version 1.2.71
+  - Don't restart NFS on failover, just do statd notification
 * Mon Nov 25 2013 : Version 1.2.70
   - Just warn when recovery fails to update flags on inactive node
 * Mon Nov 04 2013 : Version 1.2.69
