@@ -14,7 +14,16 @@ start_nfs() {
 service_name="nfs"
 service_start="start_nfs"
 service_stop="startstop_nfs stop"
-service_reconfigure="startstop_nfs restart"
+service_reconfigure="reconfigure_nfs"
+
+reconfigure_nfs ()
+{
+    # If IPs have been reallocated, we must restart the lock manager
+    # across all nodes and notify statd clients.
+    if [ -x "$CTDB_BASE/statd-callout" ] ; then
+	"$CTDB_BASE/statd-callout" notify &
+    fi >/dev/null 2>&1
+}
 
 nfs_check_thread_count ()
 {
@@ -200,12 +209,6 @@ case "$1" in
 	    ctdb_service_reconfigure
 	    exit 0
 	fi
-
-	# if the ips have been reallocated, we must restart the lockmanager
-	# across all nodes and ping all statd listeners
-	[ -x $CTDB_BASE/statd-callout ] && {
-		$CTDB_BASE/statd-callout notify &
-	} >/dev/null 2>&1
 	;;
     *)
 	ctdb_standard_event_handler "$@"
