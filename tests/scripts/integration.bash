@@ -15,6 +15,7 @@ if [ -n "$TEST_LOCAL_DAEMONS" ] ; then
     if [ -n "$ctdb_dir" -a -d "${ctdb_dir}/bin" ] ; then
 	PATH="${ctdb_dir}/bin:${PATH}"
         export CTDB_LOCK_HELPER="${ctdb_dir}/bin/ctdb_lock_helper"
+        export CTDB_EVENT_HELPER="${ctdb_dir}/bin/ctdb_event_helper"
     fi
 
     export CTDB_NODES="${TEST_VAR_DIR}/nodes.txt"
