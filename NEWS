@@ -1,3 +1,28 @@
+Changes in CTDB 2.5.2
+=====================
+
+User-visible changes
+--------------------
+
+* Much improved manpages from CTDB 2.5 are now installed and packaged.
+
+Important bug fixes
+-------------------
+
+* "ctdb reloadips" now waits for replies to addip/delip controls
+  before returning.
+
+Important internal changes
+--------------------------
+
+* The event scripts are now executed using vfork(2) and a helper
+  binary instead of fork(2) providing a performance improvement.
+
+* "ctdb reloadips" will now works if some nodes are inactive.  This
+  means that public IP addresses can be reconfigured even if nodes
+  are stopped.
+
+
 Changes in CTDB 2.5.1
 =====================
 
