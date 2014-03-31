@@ -1,3 +1,38 @@
+Changes in CTDB 2.5.3
+=====================
+
+User-visible changes
+--------------------
+
+* New configuration variable CTDB_NATGW_STATIC_ROUTES allows NAT
+  gateway feature to create static host/network routes instead of
+  default routes.  See the documentation.  Use with care.
+
+Important bug fixes
+-------------------
+
+* ctdbd no longer crashes when tickles are processed after reloading
+  the nodes file.
+
+* "ctdb reloadips" works as expected because the DEL_PUBLIC_IP control
+  now waits until public IP addresses are released before returning.
+
+Important internal changes
+--------------------------
+
+* Vacuuming performance has been improved.
+
+* Record locking now compares records based on their hashes to avoid
+  scheduling multiple requests for records on the same hashchain.
+
+* An internal timeout for revoking read-only record relegations has
+  been changed from hard-coded 5 seconds to the value of the
+  ControlTimeout tunable.  This makes it less likely that ctdbd will
+  abort.
+
+* Many test improvements and additions.
+
+
 Changes in CTDB 2.5.2
 =====================
 
