@@ -13,7 +13,9 @@ loadconfig
 }
 
 [ ! -f "$CTDB_PUBLIC_ADDRESSES" ] && {
-	echo "No public addresses file found. Nothing to do for 10.interfaces"
+	if [ "$1" = "init" ]; then
+		echo "No public addresses file found. Nothing to do for 10.interfaces"
+	fi
 	exit 0
 }
 
