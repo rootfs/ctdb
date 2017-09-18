@@ -47,7 +47,7 @@ All nodes in the cluster monitor its own health and its own consistency regards 
 recovery master. How and what the nodes monitor for differs between the node which is
 the recovery master and normal nodes.
 This monitoring it to ensure that the cluster is healthy and consistent. 
-This is not related to monitoring of inidividual node health, a.k.a. eventscript monitroing.
+This is not related to monitoring of inidividual node health, a.k.a. eventscript monitoring.
 
 At the end of each step in the process are listed some of the most common and important
 error messages that can be generated during that step.
@@ -67,23 +67,23 @@ Once every second the following monitoring loop is performed :
    "CTDB daemon is no longer available. Shutting down recovery daemon"
 
 2, Check if any of the nodes has been recorded to have misbehaved too many times.
-   If so we ban the node and log a message :
+   If so, we ban the node and log a message :
    "Node %u has caused %u failures in %.0f seconds - banning it for %u seconds"
 
 3, Check that there is a recovery master.
-   If not we initiate a clusterwide election process and log :
+   If not, we initiate a clusterwide election process and log :
    "Initial recovery master set - forcing election"
    and we restart monitoring from 1.
 
 4, Verify that recovery daemon and the local ctdb daemon agreed on all the
    node BANNING flags.
-   If the recovery daemon and the local ctdb daemon disagrees on these flags we update
-   the local ctdb daemon, logs one of two messages and restarts monitoring from 1 again.
+   If the recovery daemon and the local ctdb daemon disagree on these flags, we update
+   the local ctdb daemon, log one of two messages and restart monitoring from 1 again.
    "Local ctdb daemon on recmaster does not think this node is BANNED but the recovery master disagrees. Unbanning the node"
    "Local ctdb daemon on non-recmaster does not think this node is BANNED but the recovery master disagrees. Re-banning the node"
 
 5, Verify that the node designated to be recovery master exists in the local list of all nodes.
-   If the recovery master is not in the list of all cluster nodes a new recovery master
+   If the recovery master is not in the list of all cluster nodes, a new recovery master
    election is triggered and monitoring restarts from 1.
    "Recmaster node %u not in list. Force reelection"
 
@@ -100,9 +100,9 @@ Once every second the following monitoring loop is performed :
    If there is an inconsistency, push the flags for the local node out to all other nodes.
    "Recmaster disagrees on our flags flags:0x%x recmaster_flags:0x%x  Broadcasting out flags."
 
-9, Verify that the local node hosts all public ip addresses it should host and that it does
+9, Verify that the local node hosts all public IP addresses it should host and that it does
    NOT host any public addresses it should not host.
-   If there is an inconsistency we log an error, trigger a recovery to occur and restart
+   If there is an inconsistency, we log an error, trigger a recovery to occur and restart
    monitoring from 1 again.
    "Public address '%s' is missing and we should serve this ip"
    "We are still serving a public address '%s' that we should not be serving."
@@ -122,25 +122,25 @@ the recovery master also performs the following tests:
     error, mark this node as a candidate to become BANNED and restart monitoring from 1.
     "Unable to get nodemap from remote node %u"
 
-11, Verify that the local recovery master and the remote node agrees on the flags
+11, Verify that the local recovery master and the remote node agree on the flags
     for the remote node. If there is a inconsistency for the BANNING flag,
     log an error, trigger a new recmaster election and restart monitoring from 1.
     "Remote node %u had different BANNED flags 0x%x, local had 0x%x - trigger a re-election"
     "Remote node %u had flags 0x%x, local had 0x%x - updating local"
 
-12, Verify that the local recovery master and the remote node agrees on the flags
+12, Verify that the local recovery master and the remote node agree on the flags
     for the remote node. If one of the flags other than the BANNING flag was inconsistent,
     just update the set of flags for the local recovery daemon, log an information message
     and continue monitoring.
     "Remote node %u had flags 0x%x, local had 0x%x - updating local"
 
-13, Read the list of public ip addresses from all of the CONNECTED nodes and merge into a
+13, Read the list of public IP addresses from all of the CONNECTED nodes and merge them into a
     single clusterwide list.
-    If we fail to read the list of ips from a node, log an error and restart monitoring from 1.
+    If we fail to read the list of IPs from a node, log an error and restart monitoring from 1.
     "Failed to read public ips from node : %u"
 
 14, Verify that all other nodes agree that this node is the recovery master.
-    If one of the other nodes discgrees this is the recovery master, log an error,
+    If one of the other nodes disagrees this is the recovery master, log an error,
     force a new election and restart monitoring from 1.
     "Node %d does not agree we are the recmaster. Need a new recmaster election"
 
@@ -164,7 +164,7 @@ the recovery master also performs the following tests:
     "failed read from recovery_lock_fd - %s"
 
 19, Read the list of all nodes and flags from all CONNECTED nodes in the cluster.
-    If fail to read the nodemap from one of the remote nodes, log an error and restart
+    If reading the nodemap from one of the remote nodes fails, log an error and restart
     monitoring from 1.
     "Unable to get nodemap from remote node %u"
 
@@ -196,17 +196,17 @@ the recovery master also performs the following tests:
     "Node %u is active in the nodemap but did not exist in the vnnmap"
 
 24, Read the VNNMAP from all CONNECTED nodes.
-    Verify that all nodes have the same VNNMAP content and that all nodes are in the same
-    generation instance of the databases.
-    If not, force a recovery to re-synchronize the vnnmap and the databases across the cluster
+    Verify that all nodes have the same VNNMAP content and are in the same generation instance
+    of the databases.
+    If not, force a recovery to re-synchronize the VNNMAP and the databases across the cluster
     and restart monitoring from 1.
     "Remote node %u has different generation of vnnmap. %u vs %u (ours)"
     "Remote node %u has different size of vnnmap. %u vs %u (ours)"
     "Remote node %u has different vnnmap."
 
-25, If there has been changes to the cluster that requires a reallocation of public ip
+25, If there have been changes to the cluster that require a reallocation of public IP
     addresses. On all nodes run the "startrecovery" event. Run "releaseip" and "takeip"
-    events to reassign the ips across the cluster and finally run the "recovered" event.
+    events to reassign the IPs across the cluster and finally run the "recovered" event.
 
 Finished monitoring, continue monitoring from 1.
 
@@ -221,23 +221,21 @@ Make sure to find which node is the recovery master and check the log for that n
 
 Example log entries that start in column 1 are expected to be present in the
 log. Example log entries that are indented 3 columns are optional and might
-only be present if an error occured.
+only be present if an error occurred.
 
 
 1, Log that recovery has been initiated.
-"Starting do_recovery"
+   "Starting do_recovery"
 
    It might log an informational message :
-"New recovery culprit %u".
-   This is only semi-accurate and might may not mean that there is any problem
+   "New recovery culprit %u".
+   This is only semi-accurate and might not mean that there are any problems
    at all with the node indicated.
 
-
-2, Check if a node has caused too many failed recoveries and if so ban it from
+2, Check if a node has caused too many failed recoveries and if so, ban it from
    the cluster, giving the other nodes in the cluster a chance to recovery
    operation.
    "Node %u has caused %u recoveries in %.0f seconds - banning it for %u seconds"
-
 
 3, Verify that the recovery daemon can lock the recovery lock file.
    At this stage this should be recovery master. 
@@ -245,14 +243,12 @@ only be present if an error occured.
    "("ctdb_recovery_lock: Unable to open %s - (%s)"
    "ctdb_recovery_lock: Failed to get recovery lock on '%s'"
    "Unable to get recovery lock - aborting recovery"
-"ctdb_recovery_lock: Got recovery lock on '%s'"
-
+   "ctdb_recovery_lock: Got recovery lock on '%s'"
 
 4, Log which node caused the recovery to be initiated.
    This is a semi-accurate information message only.
    This line does NOT mean that there has to be something wrong with the node listed.
 "Recovery initiated due to problem with node %u"
-
 
 5, Pull the names of all databases from all nodes and verify that these databases also
    exists locally.
@@ -264,22 +260,18 @@ only be present if an error occured.
 
 6, Check the list of databases on each remote node and create any databases that may be missing
    on the remote node.
-"Recovery - created remote databases"
-
+   "Recovery - created remote databases"
 
 7, Set recovery mode to ACTIVE on all remote nodes.
 
-
 8, Run the "startrecovery" eventscript on all nodes.
-
    At this stage you will also get a few additional log entries, these are not
    from the recovery daemon but from the main ctdb daemon due to running
    the eventscript :
-"startrecovery eventscript has been invoked"
-"Monitoring has been disabled"
-"Executing event script ...
-...
-
+   "startrecovery eventscript has been invoked"
+   "Monitoring has been disabled"
+   "Executing event script ...
+   ...
 
 9, Create a new generation id and update the generation id and the VNNMAP on the local node
    only.
@@ -287,86 +279,68 @@ only be present if an error occured.
    that if recovery fails a new recovery is attempted in the next iteration of the monitoring
    loop.
 
-
 10, Start a TDB TRANSACTION on all nodes for all databases.
    This is to ensure that if recovery is aborted or fails that we do not
    modify any databases on only some of the nodes.
-"started transactions on all nodes"
-
+   "started transactions on all nodes"
 
 11, For each database, pull the content from all CONNECTED nodes and merge it into 
     the TDB databases on the local node.
     This merges the records from the remote nodes based on their serial numbers so we
     only keep the most recent record found.
-"Recovery - pulled remote database 0x%x"
-
+    "Recovery - pulled remote database 0x%x"
 
 12, For each database, perform a fast TDB WIPE operation to delete the entire TDB under the
     transaction started above.
 
-
 13, For each database, drop all empty records.
     Force the DMASTER field of all records to point to the recovery master.
     Push the database out to all other nodes.
-
     The PUSH process lists some additional log entries for each database of the
     form :
-"Recovery - pulled remote database 0x..."
-"Recovery - pushed remote database 0x... of size ..."
-
+    "Recovery - pulled remote database 0x..."
+    "Recovery - pushed remote database 0x... of size ..."
 
 14, Commit all changes to all TDB databases.
-"Recovery - starting database commits"
-"Recovery - committed databases"
-
+    "Recovery - starting database commits"
+    "Recovery - committed databases"
 
 15, Create a new VNNMAP of all CONNECTED nodes, create a new generation number
-    and piush this new VNNMAP out to all nodes.
-"Recovery - updated vnnmap"
-
+    and push this new VNNMAP out to all nodes.
+    "Recovery - updated vnnmap"
 
 16, Update all nodes that the local node is the recovery master.
-"Recovery - updated recmaster"
-
+    "Recovery - updated recmaster"
 
 17, synchronize node flags across the cluster.
-"Recovery - updated flags"
+    "Recovery - updated flags"
 
 18, Change recovery mode back to NORMAL.
-"Recovery - disabled recovery mode"
+    "Recovery - disabled recovery mode"
 
-
-19, Re-allocate all public ip addresses across the cluster.
-"Deterministic IPs enabled. Resetting all ip allocations"
-
+19, Re-allocate all public IP addresses across the cluster.
+    "Deterministic IPs enabled. Resetting all ip allocations"
     If the IP address allocation on the local node changes you might get
     "Takeover of IP 10.0.0.201/24 on interface eth0"
     "Release of IP 10.0.0.204/24 on interface eth0"
-
-"Recovery - takeip finished"
-
+    "Recovery - takeip finished"
 
 20, Run the "recovered" eventscript on all nodes.
-"Recovery - finished the recovered event"
-
+    "Recovery - finished the recovered event"
     You will also get an entry from the local ctdb daemon itself that it has 
     switched back to recovery mode NORMAL.
-"Recovery has finished"
-
+    "Recovery has finished"
 
 21, Broadcast a message to all samba daemons in the cluster that the databases have been
     recovered. Samba will now do some additional checking/cleanup of the content in the stored
     records.
+    "Recovery complete"
 
-"Recovery complete"
-
-
-22. Finished. At this stage a 10 second timeout (ctdb listvars : rerecoverytimeout) is 
+22. Finished. At this stage, a 10 second timeout (ctdb listvars : rerecoverytimeout) is 
     initiated. The cluster will not allow a new recovery to be performed until this timeout
     has expired.
-
-"New recoveries supressed for the rerecovery timeout"
-"Rerecovery timeout elapsed. Recovery reactivated."
+    "New recoveries supressed for the rerecovery timeout"
+    "Rerecovery timeout elapsed. Recovery reactivated."
 
 
 
